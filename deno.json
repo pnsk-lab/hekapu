@@ -1,0 +1,16 @@
+{
+  "name": "@pnsk-lab/metori",
+  "exports": {
+    ".": "./src/mod.ts",
+    "./adapter/cpu": "./src/adapter/cpu/mod.ts"
+  },
+  "tasks": {
+  },
+  "fmt": {
+    "semiColons": false,
+    "singleQuote": true
+  },
+  "imports": {
+    "@std/assert": "jsr:@std/assert@^1.0.10"
+  }
+}
