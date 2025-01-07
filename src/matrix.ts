@@ -5,6 +5,10 @@ export type CalculatingTree = Matrix | {
   type: 'add'
   left: CalculatingTree
   right: CalculatingTree
+} | {
+  type: 'sub'
+  left: CalculatingTree
+  right: CalculatingTree
 }
 
 abstract class MatrixBase {
@@ -22,7 +26,15 @@ abstract class MatrixBase {
   add(matrix: CalculatingMatrix | Matrix) {
     return new CalculatingMatrix({
       type: 'add',
-      left: matrix.tree,
+      left: this.tree,
+      right: matrix.tree,
+    }, this.#adapter)
+  }
+
+  sub(matrix: CalculatingMatrix | Matrix) {
+    return new CalculatingMatrix({
+      type: 'sub',
+      left: this.tree,
       right: matrix.tree,
     }, this.#adapter)
   }

@@ -25,5 +25,4 @@ Deno.test('setArrItemByIndexes', () => {
     [[2]],
   ]
   setArrItemByIndexes(arr, [2, 0, 0], (prev) => prev + 1)
-  console.log(arr)
 })

@@ -6,13 +6,13 @@ import createCPUAdapter from '@pnsk-lab/metori/adapter/cpu'
 const adapter = createCPUAdapter()
 const createMatrix = useMatrix(adapter)
 
-const a = createMatrix([[1, 2, 3], [4, 5, 6]])
-const b = createMatrix([[4, 5, 6], [1, 2, 3]])
+const a = createMatrix([1, 2, 3])
+const b = createMatrix([1, 1, 1])
 
 // Added is just AST
 // Not calculated
 // CalculateAST { ast: { type: 'add', left: vector, right: vector } }
-const added = a.add(b)
+const added = a.sub(b)
 
 // Use `await` to calculate (Internals use `then`)
 const result = await added

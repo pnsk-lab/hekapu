@@ -2,8 +2,9 @@ import type { MetoriAdapter } from '../shared.ts'
 import type { AnyShapeJSArray, MatrixShape } from '../../types.ts'
 import type { CalculatingTree } from '../../matrix.ts'
 import { getArrItemByIndexes, setArrItemByIndexes } from './utils/arr.ts'
+import { add, sub } from './operands.ts'
 
-interface CPUMatrix {
+export interface CPUMatrix {
   shape: MatrixShape
   data: AnyShapeJSArray
 }
@@ -42,32 +43,18 @@ class CPUAdapter implements MetoriAdapter {
         if (!leftMatrix || !rightMatrix) {
           throw new Error('Matrix not found')
         }
-        const index: number[] = []
-        for (let i = 0; i < leftMatrix.shape.length; i++) {
-          index.push(0)
+        add(leftMatrix, rightMatrix)
+        return this.createMatrixFromArray(leftMatrix.data)
+      }
+      case 'sub': {
+        const leftId = this.calculate(tree.left)
+        const rightId = this.calculate(tree.right)
+        const leftMatrix = this.#matrixes.get(leftId)
+        const rightMatrix = this.#matrixes.get(rightId)
+        if (!leftMatrix || !rightMatrix) {
+          throw new Error('Matrix not found')
         }
-
-        while (true) {
-          setArrItemByIndexes(
-            leftMatrix.data,
-            index,
-            (prev) => prev + getArrItemByIndexes(rightMatrix.data, index),
-          )
-
-          // Process index
-          index[index.length - 1]++
-          for (let i = index.length - 1; i >= 0; i--) {
-            if (index[i] >= (leftMatrix.shape[i] as number)) {
-              if (i - 1 in index) {
-                index[i - 1]++
-                index[i] = 0
-              }
-            }
-          }
-          if (index[0] >= (leftMatrix.shape[0] as number)) {
-            break
-          }
-        }
+        sub(leftMatrix, rightMatrix)
         return this.createMatrixFromArray(leftMatrix.data)
       }
     }
