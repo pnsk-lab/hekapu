@@ -1,7 +1,7 @@
 import type { MetoriAdapter } from './adapter/shared.ts'
-import type { AnyShapeJSArray } from './types.ts'
+import type { AnyShapeJSArray, GetShape, TensorShape, TypedJSArray } from './types.ts'
 
-export type CalculatingTree = Tensor| {
+export type CalculatingTree = Tensor<TensorShape> | {
   type: 'add'
   left: CalculatingTree
   right: CalculatingTree
@@ -11,8 +11,9 @@ export type CalculatingTree = Tensor| {
   right: CalculatingTree
 }
 
-abstract class TensorBase {
+abstract class TensorBase<Shape extends TensorShape> {
   abstract tree: CalculatingTree
+  shape?: Shape
   #adapter: MetoriAdapter
   constructor(adapter: MetoriAdapter) {
     this.#adapter = adapter
@@ -23,7 +24,7 @@ abstract class TensorBase {
    * @param tensor Tensor to add
    * @returns CalculatingTensor
    */
-  add(tensor: CalculatingTensor | Tensor) {
+  add(tensor: CalculatingTensor<Shape> | Tensor<Shape>) {
     return new CalculatingTensor({
       type: 'add',
       left: this.tree,
@@ -36,7 +37,7 @@ abstract class TensorBase {
    * @param tensor Tensor to subtract
    * @returns CalculatingTensor
    */
-  sub(tensor: CalculatingTensor | Tensor) {
+  sub(tensor: CalculatingTensor<Shape> | Tensor<Shape>) {
     return new CalculatingTensor({
       type: 'sub',
       left: this.tree,
@@ -45,7 +46,7 @@ abstract class TensorBase {
   }
 }
 
-export class CalculatingTensor extends TensorBase {
+export class CalculatingTensor<Shape extends TensorShape> extends TensorBase<Shape> {
   #adapter: MetoriAdapter
   tree: CalculatingTree
   constructor(tree: CalculatingTree, adapter: MetoriAdapter) {
@@ -54,14 +55,14 @@ export class CalculatingTensor extends TensorBase {
     this.#adapter = adapter
   }
 
-  async calculate(): Promise<Tensor> {
+  async calculate(): Promise<Tensor<Shape>> {
     const id = await this.#adapter.calculate(this.tree)
     return new Tensor(id, this.#adapter)
   }
 
-  then<TResult1 = Tensor, TResult2 = never>(
+  then<TResult1 = Tensor<Shape>, TResult2 = never>(
     onfulfilled?:
-      | ((value: Tensor) => TResult1 | PromiseLike<TResult1>)
+      | ((value: Tensor<Shape>) => TResult1 | PromiseLike<TResult1>)
       | undefined
       | null,
     onrejected?:
@@ -76,7 +77,7 @@ export class CalculatingTensor extends TensorBase {
   }
 }
 
-export class Tensor extends TensorBase {
+export class Tensor<Shape extends TensorShape> extends TensorBase<Shape> {
   id: number
   tree = this
   #adapter: MetoriAdapter
@@ -93,7 +94,7 @@ export class Tensor extends TensorBase {
 }
 
 export interface CreateTensor {
-  (input: AnyShapeJSArray): Tensor
+  <T extends TypedJSArray<TensorShape>>(input: T): Tensor<GetShape<T>>
 }
 
 export const useTensor = (adapter: MetoriAdapter): CreateTensor => {
