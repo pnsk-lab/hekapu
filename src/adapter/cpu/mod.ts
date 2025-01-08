@@ -1,7 +1,6 @@
-import type { MetoriAdapter } from '../shared.ts'
+import type { MetoriAdapter, SupportedOperations } from '../shared.ts'
 import type { AnyShapeJSArray, MatrixShape } from '../../types.ts'
 import type { CalculatingTree } from '../../matrix.ts'
-import { getArrItemByIndexes, setArrItemByIndexes } from './utils/arr.ts'
 import { add, sub } from './operands.ts'
 
 export interface CPUMatrix {
@@ -10,6 +9,7 @@ export interface CPUMatrix {
 }
 class CPUAdapter implements MetoriAdapter {
   name = 'metori/cpu'
+  supportedOperations: SupportedOperations[] = ['add', 'sub']
 
   #matrixes = new Map<number, CPUMatrix>()
   #id = 0

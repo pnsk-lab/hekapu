@@ -31,6 +31,11 @@ abstract class MatrixBase {
     }, this.#adapter)
   }
 
+  /**
+   * Subtract matrix
+   * @param matrix Matrix to subtract
+   * @returns CalculatingMatrix
+   */
   sub(matrix: CalculatingMatrix | Matrix) {
     return new CalculatingMatrix({
       type: 'sub',

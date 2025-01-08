@@ -1,8 +1,15 @@
 import type { AnyShapeJSArray } from '../types.ts'
 import type { CalculatingTree } from '../matrix.ts'
 
+export type SupportedOperations = 'add' | 'sub'
+
 export interface MetoriAdapter {
   name: string
+
+  /**
+   * Supported operations
+   */
+  supportedOperations: SupportedOperations[]
 
   /**
    * Create matrix from JS array
