@@ -1,13 +1,13 @@
 // Just idea (not working and not implemented)
 
-import { useMatrix } from '@pnsk-lab/metori'
+import { useTensor } from '@pnsk-lab/metori'
 import createCPUAdapter from '@pnsk-lab/metori/adapter/cpu'
 
 const adapter = createCPUAdapter()
-const createMatrix = useMatrix(adapter)
+const createTensor = useTensor(adapter)
 
-const a = createMatrix([1, 2, 3])
-const b = createMatrix([1, 1, 1])
+const a = createTensor([1, 2, 3])
+const b = createTensor([1, 1, 1])
 
 // Added is just AST
 // Not calculated

@@ -1,1 +1,1 @@
-export * from './matrix.ts'
+export * from './tensor.ts'

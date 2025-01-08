@@ -1,21 +1,21 @@
 import type { MetoriAdapter, SupportedOperations } from '../shared.ts'
-import type { AnyShapeJSArray, MatrixShape } from '../../types.ts'
-import type { CalculatingTree } from '../../matrix.ts'
+import type { AnyShapeJSArray, TensorShape } from '../../types.ts'
+import type { CalculatingTree } from '../../tensor.ts'
 import { add, sub } from './operands.ts'
 
-export interface CPUMatrix {
-  shape: MatrixShape
+export interface CPUTensor {
+  shape: TensorShape
   data: AnyShapeJSArray
 }
 class CPUAdapter implements MetoriAdapter {
   name = 'metori/cpu'
   supportedOperations: SupportedOperations[] = ['add', 'sub']
 
-  #matrixes = new Map<number, CPUMatrix>()
+  #tensors = new Map<number, CPUTensor>()
   #id = 0
 
-  createMatrixFromArray(input: AnyShapeJSArray) {
-    const shape: MatrixShape = []
+  createTensorFromArray(input: AnyShapeJSArray) {
+    const shape: TensorShape = []
     let crr: AnyShapeJSArray = input
     while (true) {
       shape.push(crr.length)
@@ -26,47 +26,47 @@ class CPUAdapter implements MetoriAdapter {
       crr = next
     }
     this.#id++
-    this.#matrixes.set(this.#id, { shape, data: input })
+    this.#tensors.set(this.#id, { shape, data: input })
     return this.#id
   }
 
   calculate(tree: CalculatingTree) {
-    if (!('type' in tree)) {
+    if ('id' in tree) {
       return tree.id
     }
     switch (tree.type) {
       case 'add': {
         const leftId = this.calculate(tree.left)
         const rightId = this.calculate(tree.right)
-        const leftMatrix = this.#matrixes.get(leftId)
-        const rightMatrix = this.#matrixes.get(rightId)
-        if (!leftMatrix || !rightMatrix) {
-          throw new Error('Matrix not found')
+        const leftTensor = this.#tensors.get(leftId)
+        const rightTensor = this.#tensors.get(rightId)
+        if (!leftTensor || !rightTensor) {
+          throw new Error('Tensor not found')
         }
-        add(leftMatrix, rightMatrix)
-        return this.createMatrixFromArray(leftMatrix.data)
+        add(leftTensor, rightTensor)
+        return this.createTensorFromArray(leftTensor.data)
       }
       case 'sub': {
         const leftId = this.calculate(tree.left)
         const rightId = this.calculate(tree.right)
-        const leftMatrix = this.#matrixes.get(leftId)
-        const rightMatrix = this.#matrixes.get(rightId)
-        if (!leftMatrix || !rightMatrix) {
-          throw new Error('Matrix not found')
+        const leftTensor = this.#tensors.get(leftId)
+        const rightTensor = this.#tensors.get(rightId)
+        if (!leftTensor || !rightTensor) {
+          throw new Error('Tensor not found')
         }
-        sub(leftMatrix, rightMatrix)
-        return this.createMatrixFromArray(leftMatrix.data)
+        sub(leftTensor, rightTensor)
+        return this.createTensorFromArray(leftTensor.data)
       }
     }
     throw new TypeError('calculate failed.')
   }
 
   toArray(id: number) {
-    const matrix = this.#matrixes.get(id)
-    if (!matrix) {
-      throw new Error('Matrix not found')
+    const tensor = this.#tensors.get(id)
+    if (!tensor) {
+      throw new Error('Tensor not found')
     }
-    return matrix.data
+    return tensor.data
   }
 }
 

@@ -1,7 +1,7 @@
 import type { MetoriAdapter } from './adapter/shared.ts'
 import type { AnyShapeJSArray } from './types.ts'
 
-export type CalculatingTree = Matrix | {
+export type CalculatingTree = Tensor| {
   type: 'add'
   left: CalculatingTree
   right: CalculatingTree
@@ -11,7 +11,7 @@ export type CalculatingTree = Matrix | {
   right: CalculatingTree
 }
 
-abstract class MatrixBase {
+abstract class TensorBase {
   abstract tree: CalculatingTree
   #adapter: MetoriAdapter
   constructor(adapter: MetoriAdapter) {
@@ -19,33 +19,33 @@ abstract class MatrixBase {
   }
 
   /**
-   * Add matrix
-   * @param matrix Matrix to add
-   * @returns CalculatingMatrix
+   * Add tensor
+   * @param tensor Tensor to add
+   * @returns CalculatingTensor
    */
-  add(matrix: CalculatingMatrix | Matrix) {
-    return new CalculatingMatrix({
+  add(tensor: CalculatingTensor | Tensor) {
+    return new CalculatingTensor({
       type: 'add',
       left: this.tree,
-      right: matrix.tree,
+      right: tensor.tree,
     }, this.#adapter)
   }
 
   /**
-   * Subtract matrix
-   * @param matrix Matrix to subtract
-   * @returns CalculatingMatrix
+   * Subtract tensor
+   * @param tensor Tensor to subtract
+   * @returns CalculatingTensor
    */
-  sub(matrix: CalculatingMatrix | Matrix) {
-    return new CalculatingMatrix({
+  sub(tensor: CalculatingTensor | Tensor) {
+    return new CalculatingTensor({
       type: 'sub',
       left: this.tree,
-      right: matrix.tree,
+      right: tensor.tree,
     }, this.#adapter)
   }
 }
 
-export class CalculatingMatrix extends MatrixBase {
+export class CalculatingTensor extends TensorBase {
   #adapter: MetoriAdapter
   tree: CalculatingTree
   constructor(tree: CalculatingTree, adapter: MetoriAdapter) {
@@ -54,14 +54,14 @@ export class CalculatingMatrix extends MatrixBase {
     this.#adapter = adapter
   }
 
-  async calculate(): Promise<Matrix> {
+  async calculate(): Promise<Tensor> {
     const id = await this.#adapter.calculate(this.tree)
-    return new Matrix(id, this.#adapter)
+    return new Tensor(id, this.#adapter)
   }
 
-  then<TResult1 = Matrix, TResult2 = never>(
+  then<TResult1 = Tensor, TResult2 = never>(
     onfulfilled?:
-      | ((value: Matrix) => TResult1 | PromiseLike<TResult1>)
+      | ((value: Tensor) => TResult1 | PromiseLike<TResult1>)
       | undefined
       | null,
     onrejected?:
@@ -76,7 +76,7 @@ export class CalculatingMatrix extends MatrixBase {
   }
 }
 
-export class Matrix extends MatrixBase {
+export class Tensor extends TensorBase {
   id: number
   tree = this
   #adapter: MetoriAdapter
@@ -92,13 +92,13 @@ export class Matrix extends MatrixBase {
   }
 }
 
-export interface CreateMatrix {
-  (input: AnyShapeJSArray): Matrix
+export interface CreateTensor {
+  (input: AnyShapeJSArray): Tensor
 }
 
-export const useMatrix = (adapter: MetoriAdapter): CreateMatrix => {
+export const useTensor = (adapter: MetoriAdapter): CreateTensor => {
   return (input) => {
-    const id = adapter.createMatrixFromArray(input)
-    return new Matrix(id, adapter)
+    const id = adapter.createTensorFromArray(input)
+    return new Tensor(id, adapter)
   }
 }

@@ -1,5 +1,5 @@
 import type { AnyShapeJSArray } from '../types.ts'
-import type { CalculatingTree } from '../matrix.ts'
+import type { CalculatingTree } from '../tensor.ts'
 
 export type SupportedOperations = 'add' | 'sub'
 
@@ -12,22 +12,22 @@ export interface MetoriAdapter {
   supportedOperations: SupportedOperations[]
 
   /**
-   * Create matrix from JS array
+   * Create tensor from JS array
    * @param input Input JS array
-   * @returns Matrix ID
+   * @returns Tensor ID
    */
-  createMatrixFromArray: (input: AnyShapeJSArray) => number
+  createTensorFromArray: (input: AnyShapeJSArray) => number
 
   /**
-   * Calculate matrix
+   * Calculate tensor
    * @param tree Calculating tree
-   * @returns Calculated matrix
+   * @returns Calculated tensor
    */
   calculate: (tree: CalculatingTree) => Promise<number> | number
 
   /**
-   * Convert matrix to array
-   * @param id Matrix ID
+   * Convert tensor to array
+   * @param id Tensor ID
    * @returns Array
    */
   toArray: (id: number) => Promise<AnyShapeJSArray> | AnyShapeJSArray

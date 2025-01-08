@@ -1,13 +1,13 @@
 import { assertEquals } from '@std/assert'
-import type { CPUMatrix } from './mod.ts'
+import type { CPUTensor } from './mod.ts'
 import { processLR } from './operands.ts'
 
 Deno.test('processLR', () => {
-  const leftMatrix = (): CPUMatrix => ({
+  const leftMatrix = (): CPUTensor => ({
     data: [[1, 2], [3, 4]],
     shape: [2, 2]
   })
-  const rightMatrix = (): CPUMatrix => ({
+  const rightMatrix = (): CPUTensor => ({
     data: [[5, 6], [7, 8]],
     shape: [2, 2]
   })

@@ -1,7 +1,7 @@
-import type { CPUMatrix } from './mod.ts'
+import type { CPUTensor } from './mod.ts'
 import { getArrItemByIndexes, setArrItemByIndexes } from './utils/arr.ts'
 
-export const processLR = (leftMatrix: CPUMatrix, rightMatrix: CPUMatrix, calculate: (left: number, right: number) => number) => {
+export const processLR = (leftMatrix: CPUTensor, rightMatrix: CPUTensor, calculate: (left: number, right: number) => number) => {
   const index: number[] = []
   for (let i = 0; i < leftMatrix.shape.length; i++) {
     index.push(0)
@@ -33,10 +33,10 @@ export const processLR = (leftMatrix: CPUMatrix, rightMatrix: CPUMatrix, calcula
   return leftMatrix
 }
 
-export const add = (leftMatrix: CPUMatrix, rightMatrix: CPUMatrix) => {
+export const add = (leftMatrix: CPUTensor, rightMatrix: CPUTensor) => {
   return processLR(leftMatrix, rightMatrix, (left, right) => left + right)
 }
-export const sub = (leftMatrix: CPUMatrix, rightMatrix: CPUMatrix) => {
+export const sub = (leftMatrix: CPUTensor, rightMatrix: CPUTensor) => {
   return processLR(leftMatrix, rightMatrix, (left, right) => {
     return left - right
   })

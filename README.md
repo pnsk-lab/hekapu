@@ -1,4 +1,4 @@
 # Metori
 
-Metori is a library for calculating matrixes and creating ML programs, with
+Metori is a library for calculating tensorsand creating ML programs, with
 TypeScript.
