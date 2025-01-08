@@ -6,8 +6,8 @@ import createCPUAdapter from '@pnsk-lab/metori/adapter/cpu'
 const adapter = createCPUAdapter()
 const createTensor = useTensor(adapter)
 
-const a = createTensor([1, 2, 3])
-const b = createTensor([1, 1, 1])
+const a = createTensor([1, 2, 3] as const)
+const b = createTensor([1, 1, 1] as const)
 
 // Added is just AST
 // Not calculated

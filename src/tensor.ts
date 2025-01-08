@@ -72,6 +72,10 @@ export class CalculatingTensor<Shape extends TensorShape> extends TensorBase<Sha
   ): Promise<TResult1 | TResult2> {
     return this.calculate().then(onfulfilled, onrejected)
   }
+
+  async getShape(): Promise<Shape> {
+    return await this.calculate().then((m) => m.getShape())
+  }
   async toArray() {
     return await this.calculate().then((m) => m.toArray())
   }
@@ -86,6 +90,10 @@ export class Tensor<Shape extends TensorShape> extends TensorBase<Shape> {
 
     this.id = id
     this.#adapter = adapter
+  }
+
+  async getShape(): Promise<Shape> {
+    return await this.#adapter.getShape(this.id) as Shape
   }
 
   async toArray() {

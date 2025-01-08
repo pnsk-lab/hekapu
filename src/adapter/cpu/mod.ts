@@ -63,6 +63,14 @@ class CPUAdapter implements MetoriAdapter {
     throw new TypeError('calculate failed.')
   }
 
+  getShape(id: number) {
+    const tensor = this.#tensors.get(id)
+    if (!tensor) {
+      throw new Error('Tensor not found')
+    }
+    return tensor.shape
+  }
+
   toArray(id: number) {
     const tensor = this.#tensors.get(id)
     if (!tensor) {

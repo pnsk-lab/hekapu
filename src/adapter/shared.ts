@@ -1,4 +1,4 @@
-import type { AnyShapeJSArray } from '../types.ts'
+import type { AnyShapeJSArray, TensorShape } from '../types.ts'
 import type { CalculatingTree } from '../tensor.ts'
 
 export type SupportedOperations = 'add' | 'sub'
@@ -31,4 +31,11 @@ export interface MetoriAdapter {
    * @returns Array
    */
   toArray: (id: number) => Promise<AnyShapeJSArray> | AnyShapeJSArray
+
+  /**
+   * Get tensor shape
+   * @param id Tensor ID
+   * @returns Shape
+   */
+  getShape: (id: number) => Promise<TensorShape> | TensorShape
 }
