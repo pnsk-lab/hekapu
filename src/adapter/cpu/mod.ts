@@ -16,14 +16,16 @@ class CPUAdapter implements MetoriAdapter {
 
   createTensorFromArray(input: AnyShapeJSArray) {
     const shape: TensorShape = []
-    let crr: AnyShapeJSArray = input
-    while (true) {
-      shape.push(crr.length)
-      const next = crr[0]
-      if (!Array.isArray(next)) {
-        break
+    if (Array.isArray(input)) {
+      let crr = input
+      while (true) {
+        shape.push(crr.length)
+        const next = crr[0]
+        if (!Array.isArray(next)) {
+          break
+        }
+        crr = next
       }
-      crr = next
     }
     this.#id++
     this.#tensors.set(this.#id, { shape, data: input })

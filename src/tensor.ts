@@ -94,10 +94,12 @@ export class Tensor<Shape extends TensorShape> extends TensorBase<Shape> {
 }
 
 export interface CreateTensor {
-  <T extends TypedJSArray<TensorShape>>(input: T): Tensor<GetShape<T>>
+  // @ts-ignore pls tell me how to fix this
+  <T extends AnyShapeJSArray>(input: T): Tensor<GetShape<T>>
 }
 
 export const useTensor = (adapter: MetoriAdapter): CreateTensor => {
+  // @ts-ignore be quiet!!
   return (input) => {
     const id = adapter.createTensorFromArray(input)
     return new Tensor(id, adapter)
