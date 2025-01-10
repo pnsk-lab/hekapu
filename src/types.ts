@@ -1,4 +1,4 @@
-import type { Tensor } from './tensor.ts'
+import type { Tensor } from './core/tensor.ts'
 
 export type TensorShape = number[]
 
@@ -25,4 +25,10 @@ export type CalculatingNode = {
   type: 'sub'
   left: CalculatingNode
   right: CalculatingNode
+} | {
+  type: 'zeros'
+  shape: TensorShape
+} | {
+  type: 'ones'
+  shape: TensorShape
 }

@@ -1,1 +1,1 @@
-export * from './tensor.ts'
+export * from './core/mod.ts'

@@ -1,22 +1,11 @@
 // Just idea (not working and not implemented)
 
-import { useTensor } from '@pnsk-lab/metori'
+import { useAdapter } from '@pnsk-lab/metori'
 import createCPUAdapter from '@pnsk-lab/metori/adapter/cpu'
 
-const adapter = createCPUAdapter()
-const createTensor = useTensor(adapter)
+const mt = useAdapter(createCPUAdapter())
 
-const a = createTensor([1, 2, 3] as const)
-const b = createTensor([1, 1, 1] as const)
+const a = mt.tensor([1, 2, 4] as const)
+const b = mt.ones([3] as const)
 
-// Added is just AST
-// Not calculated
-// CalculateAST { ast: { type: 'add', left: vector, right: vector } }
-const added = a.add(b)
-
-// Use `await` to calculate (Internals use `then`)
-const result = await added
-
-// Output Vector
-// To convert to array, we need to use `await`
-console.log(await result.toArray())
+console.log(await a.add(b).toArray())

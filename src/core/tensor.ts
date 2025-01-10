@@ -1,5 +1,5 @@
-import type { MetoriAdapter } from './adapter/shared.ts'
-import type { AnyShapeJSArray, GetShape, TensorShape, CalculatingNode } from './types.ts'
+import type { MetoriAdapter } from '../adapter/shared.ts'
+import type { AnyShapeJSArray, GetShape, TensorShape, CalculatingNode } from '../types.ts'
 
 abstract class TensorBase<Shape extends TensorShape> {
   abstract tree: CalculatingNode

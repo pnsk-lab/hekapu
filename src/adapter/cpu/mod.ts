@@ -1,6 +1,6 @@
 import type { MetoriAdapter, SupportedOperations } from '../shared.ts'
 import type { AnyShapeJSArray, TensorShape, CalculatingNode } from '../../types.ts'
-import { add, sub } from './operands.ts'
+import { add, ones, sub, zeros } from './operands.ts'
 
 export interface CPUTensor {
   shape: TensorShape
@@ -8,7 +8,7 @@ export interface CPUTensor {
 }
 class CPUAdapter implements MetoriAdapter {
   name = 'metori/cpu'
-  supportedOperations: SupportedOperations = new Set(['add', 'sub'])
+  supportedOperations: SupportedOperations = new Set(['add', 'sub', 'zeros', 'ones'])
 
   #tensors = new Map<number, CPUTensor>()
   #id = 0
@@ -57,6 +57,16 @@ class CPUAdapter implements MetoriAdapter {
         }
         sub(leftTensor, rightTensor)
         return this.createTensorFromArray(leftTensor.data)
+      }
+      case 'zeros': {
+        const shape = tree.shape
+        const data = zeros(shape)
+        return this.createTensorFromArray(data)
+      }
+      case 'ones': {
+        const shape = tree.shape
+        const data = ones(shape)
+        return this.createTensorFromArray(data)
       }
     }
     throw new TypeError('calculate failed.')

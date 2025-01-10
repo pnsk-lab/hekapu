@@ -1,3 +1,4 @@
+import { AnyShapeJSArray, TensorShape } from '../../types.ts'
 import type { CPUTensor } from './mod.ts'
 import { getArrItemByIndexes, setArrItemByIndexes } from './utils/arr.ts'
 
@@ -40,4 +41,28 @@ export const sub = (leftMatrix: CPUTensor, rightMatrix: CPUTensor) => {
   return processLR(leftMatrix, rightMatrix, (left, right) => {
     return left - right
   })
+}
+export const zeros = (shape: TensorShape, target: AnyShapeJSArray = []) => {
+  for (let i = 0; i < shape[0]; i++) {
+    if (shape.length > 1) {
+      const thisTarget: AnyShapeJSArray = []
+      target.push(thisTarget)
+      zeros(shape.slice(1), thisTarget)
+    } else {
+      target.push(0)
+    }
+  }
+  return target
+}
+export const ones = (shape: TensorShape, target: AnyShapeJSArray = []) => {
+  for (let i = 0; i < shape[0]; i++) {
+    if (shape.length > 1) {
+      const thisTarget: AnyShapeJSArray = []
+      target.push(thisTarget)
+      ones(shape.slice(1), thisTarget)
+    } else {
+      target.push(1)
+    }
+  }
+  return target
 }
