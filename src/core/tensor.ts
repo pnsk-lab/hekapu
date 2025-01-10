@@ -34,6 +34,19 @@ abstract class TensorBase<Shape extends TensorShape> {
       right: tensor.tree,
     }, this.#adapter)
   }
+
+  /**
+   * Dot product
+   * @param tensor Vector to dot product
+   * @returns CalculatingTensor
+   */
+  dot(tensor: CalculatingTensor<Shape> | Tensor<Shape>) {
+    return new CalculatingTensor({
+      type: 'dot',
+      left: this.tree,
+      right: tensor.tree,
+    }, this.#adapter)
+  }
 }
 
 export class CalculatingTensor<Shape extends TensorShape> extends TensorBase<Shape> {

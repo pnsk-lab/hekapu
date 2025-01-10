@@ -1,4 +1,4 @@
-import type { AnyShapeJSArray, TensorShape, CalculatingNode } from '../types.ts'
+import type { AnyShapeJSArray, TensorShape, CalculatingNode, AnyShapeJSArrayOrNumber } from '../types.ts'
 
 export type SupportedOperations = Set<CalculatingNode['type']>
 export interface MetoriAdapter {
@@ -28,7 +28,7 @@ export interface MetoriAdapter {
    * @param id Tensor ID
    * @returns Array
    */
-  toArray: (id: number) => Promise<AnyShapeJSArray> | AnyShapeJSArray
+  toArray: (id: number) => Promise<AnyShapeJSArrayOrNumber> | AnyShapeJSArrayOrNumber
 
   /**
    * Get tensor shape
