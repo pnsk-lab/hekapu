@@ -47,6 +47,19 @@ abstract class TensorBase<Shape extends TensorShape> {
       right: tensor.tree,
     }, this.#adapter)
   }
+
+  /**
+   * Matrix multiplication
+   * @param tensor Tensor to multiply
+   * @returns CalculatingTensor
+   */
+  matmul(tensor: CalculatingTensor<Shape> | Tensor<Shape>) {
+    return new CalculatingTensor({
+      type: 'matmul',
+      left: this.tree,
+      right: tensor.tree,
+    }, this.#adapter)
+  }
 }
 
 export class CalculatingTensor<Shape extends TensorShape> extends TensorBase<Shape> {

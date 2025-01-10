@@ -36,4 +36,8 @@ export type CalculatingNode = {
   type: 'dot'
   left: CalculatingNode
   right: CalculatingNode
+} | {
+  type: 'matmul'
+  left: CalculatingNode
+  right: CalculatingNode
 }

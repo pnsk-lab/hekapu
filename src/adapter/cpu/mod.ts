@@ -1,6 +1,6 @@
 import type { MetoriAdapter, SupportedOperations } from '../shared.ts'
 import type { AnyShapeJSArray, TensorShape, CalculatingNode, AnyShapeJSArrayOrNumber } from '../../types.ts'
-import { add, dot, ones, sub, zeros } from './operands.ts'
+import { add, dot, matmul, ones, sub, zeros } from './operands.ts'
 
 export type CPUTensor = {
   shape: TensorShape
@@ -11,10 +11,16 @@ export type CPUTensor = {
 }
 class CPUAdapter implements MetoriAdapter {
   name = 'metori/cpu'
-  supportedOperations: SupportedOperations = new Set(['add', 'sub', 'zeros', 'ones', 'dot'])
+  supportedOperations: SupportedOperations = new Set(['add', 'sub', 'zeros', 'ones', 'dot', 'matmul'])
 
   #tensors = new Map<number, CPUTensor>()
   #id = 0
+
+  #createTensorFromCPUTensor(input: CPUTensor) {
+    this.#id++
+    this.#tensors.set(this.#id, input)
+    return this.#id
+  }
 
   createTensorFromArray(input: AnyShapeJSArrayOrNumber) {
     const shape: TensorShape = []
@@ -29,9 +35,7 @@ class CPUAdapter implements MetoriAdapter {
         crr = next
       }
     }
-    this.#id++
-    this.#tensors.set(this.#id, { shape, data: input })
-    return this.#id
+    return this.#createTensorFromCPUTensor({ shape, data: input })
   }
 
   calculate(tree: CalculatingNode) {
@@ -80,6 +84,16 @@ class CPUAdapter implements MetoriAdapter {
           throw new Error('Tensor not found')
         }
         return this.createTensorFromArray(dot(leftTensor, rightTensor))
+      }
+      case 'matmul': {
+        const leftId = this.calculate(tree.left)
+        const rightId = this.calculate(tree.right)
+        const leftTensor = this.#tensors.get(leftId)
+        const rightTensor = this.#tensors.get(rightId)
+        if (!leftTensor || !rightTensor) {
+          throw new Error('Tensor not found')
+        }
+        return this.#createTensorFromCPUTensor(matmul(leftTensor, rightTensor))
       }
     }
     throw new TypeError('calculate failed.')

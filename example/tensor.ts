@@ -5,7 +5,7 @@ import createCPUAdapter from '@pnsk-lab/metori/adapter/cpu'
 
 const mt = useAdapter(createCPUAdapter())
 
-const a = mt.tensor([1, 2, 3] as const)
-const b = mt.tensor([2, 4, 6] as const)
+const a = mt.tensor([[1,1], [2,2], [3,3]])
+const b = mt.tensor([[1, 2], [3, 4]])
 
-console.log(await a.dot(b).toArray())
+console.log(await a.matmul(b).toArray())

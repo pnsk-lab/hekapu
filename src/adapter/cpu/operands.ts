@@ -91,3 +91,30 @@ export const dot = (leftMatrix: CPUTensor, rightMatrix: CPUTensor) => {
   }
   return result
 }
+
+export const matmul = (leftMatrix: CPUTensor, rightMatrix: CPUTensor): CPUTensor => {
+  const leftShape = leftMatrix.shape
+  const rightShape = rightMatrix.shape
+  if (leftShape.length !== 2 || rightShape.length !== 2) {
+    throw new Error('Matrix multiplication is only supported for 2D matrices')
+  }
+
+  const left = leftMatrix.data as AnyShapeJSArray
+  const right = rightMatrix.data as AnyShapeJSArray
+
+  const result: number[][] = []
+
+  for (let i = 0; i < leftShape[0]; i++) {
+    const row: number[] = []
+    for (let j = 0; j < rightShape[1]; j++) {
+      let sum = 0
+      for (let k = 0; k < leftShape[1]; k++) {
+        sum += ((left[i] as number[])[k] as number) * ((right[k] as number[])[j] as number)
+      }
+      row.push(sum)
+    }
+    result.push(row)
+  }
+
+  return { shape: [leftShape[0], rightShape[1]], data: result }
+}
