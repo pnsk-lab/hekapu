@@ -1,3 +1,5 @@
+import type { Tensor } from './tensor.ts'
+
 export type TensorShape = number[]
 
 export type AnyShapeJSArray = (number | AnyShapeJSArray)[]
@@ -11,3 +13,16 @@ export type GetShape<T extends AnyShapeJSArray> = T extends { length: infer L }
     ? [L, ...GetShape<T[number]>]
     : [L]
   : []
+
+export type CalculatingNode = {
+  type: 'tensor'
+  id: number
+} | {
+  type: 'add'
+  left: CalculatingNode
+  right: CalculatingNode
+} | {
+  type: 'sub'
+  left: CalculatingNode
+  right: CalculatingNode
+}

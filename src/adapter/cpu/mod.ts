@@ -1,6 +1,5 @@
 import type { MetoriAdapter, SupportedOperations } from '../shared.ts'
-import type { AnyShapeJSArray, TensorShape } from '../../types.ts'
-import type { CalculatingTree } from '../../tensor.ts'
+import type { AnyShapeJSArray, TensorShape, CalculatingNode } from '../../types.ts'
 import { add, sub } from './operands.ts'
 
 export interface CPUTensor {
@@ -9,7 +8,7 @@ export interface CPUTensor {
 }
 class CPUAdapter implements MetoriAdapter {
   name = 'metori/cpu'
-  supportedOperations: SupportedOperations[] = ['add', 'sub']
+  supportedOperations: SupportedOperations = new Set(['add', 'sub'])
 
   #tensors = new Map<number, CPUTensor>()
   #id = 0
@@ -32,7 +31,7 @@ class CPUAdapter implements MetoriAdapter {
     return this.#id
   }
 
-  calculate(tree: CalculatingTree) {
+  calculate(tree: CalculatingNode) {
     if ('id' in tree) {
       return tree.id
     }

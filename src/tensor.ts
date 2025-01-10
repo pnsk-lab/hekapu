@@ -1,18 +1,8 @@
 import type { MetoriAdapter } from './adapter/shared.ts'
-import type { AnyShapeJSArray, GetShape, TensorShape, TypedJSArray } from './types.ts'
-
-export type CalculatingTree = Tensor<TensorShape> | {
-  type: 'add'
-  left: CalculatingTree
-  right: CalculatingTree
-} | {
-  type: 'sub'
-  left: CalculatingTree
-  right: CalculatingTree
-}
+import type { AnyShapeJSArray, GetShape, TensorShape, CalculatingNode } from './types.ts'
 
 abstract class TensorBase<Shape extends TensorShape> {
-  abstract tree: CalculatingTree
+  abstract tree: CalculatingNode
   shape?: Shape
   #adapter: MetoriAdapter
   constructor(adapter: MetoriAdapter) {
@@ -48,8 +38,8 @@ abstract class TensorBase<Shape extends TensorShape> {
 
 export class CalculatingTensor<Shape extends TensorShape> extends TensorBase<Shape> {
   #adapter: MetoriAdapter
-  tree: CalculatingTree
-  constructor(tree: CalculatingTree, adapter: MetoriAdapter) {
+  tree: CalculatingNode
+  constructor(tree: CalculatingNode, adapter: MetoriAdapter) {
     super(adapter)
     this.tree = tree
     this.#adapter = adapter
@@ -83,13 +73,17 @@ export class CalculatingTensor<Shape extends TensorShape> extends TensorBase<Sha
 
 export class Tensor<Shape extends TensorShape> extends TensorBase<Shape> {
   id: number
-  tree = this
   #adapter: MetoriAdapter
+  tree: CalculatingNode
   constructor(id: number, adapter: MetoriAdapter) {
     super(adapter)
 
     this.id = id
     this.#adapter = adapter
+    this.tree = {
+      type: 'tensor',
+      id,
+    }
   }
 
   async getShape(): Promise<Shape> {
