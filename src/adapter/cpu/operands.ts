@@ -118,3 +118,36 @@ export const matmul = (leftMatrix: CPUTensor, rightMatrix: CPUTensor): CPUTensor
 
   return { shape: [leftShape[0], rightShape[1]], data: result }
 }
+
+export const matVecMul = (leftTensor: CPUTensor, rightTensor: CPUTensor): CPUTensor => {
+  let matrix: CPUTensor
+  let vector: CPUTensor
+  if (leftTensor.shape.length === 1) {
+    if (rightTensor.shape.length !== 2) {
+      throw new Error('Vector must be a 1D tensor')
+    }
+    matrix = rightTensor
+    vector = leftTensor
+  } else if (rightTensor.shape.length === 1) {
+    if (leftTensor.shape.length !== 2) {
+      throw new Error('Vector must be a 1D tensor')
+    }
+    matrix = leftTensor
+    vector = rightTensor
+  } else {
+    throw new Error('matVecMul is only supported for 2D matrix and 1D vector')
+  }
+
+  const outputShape = [matrix.shape[1]]
+
+  const result: number[] = []
+  for (let i = 0; i < outputShape[0]; i++) {
+    let sum = 0
+    for (let j = 0; j < matrix.shape[0]; j++) {
+      sum += (matrix.data as number[][])[j][i] * (vector.data as number[])[j]
+    }
+    result.push(sum)
+  }
+
+  return { shape: outputShape, data: result }
+}

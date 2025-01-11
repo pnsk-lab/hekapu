@@ -1,6 +1,6 @@
 import { assertEquals } from '@std/assert'
 import type { CPUTensor } from './mod.ts'
-import { matmul, ones, processLR, zeros } from './operands.ts'
+import { matmul, matVecMul, ones, processLR, zeros } from './operands.ts'
 
 Deno.test('processLR', () => {
   const leftMatrix = (): CPUTensor => ({
@@ -36,3 +36,11 @@ Deno.test('matmul', () => {
 
   assertEquals(matmul(left, right), { shape: [3, 2], data: [[4, 6], [8, 12], [12, 18]] })
 })
+
+Deno.test('matVecMul', () => {
+  const left = { shape: [2], data: [1, 2] }
+  const right = { shape: [2, 3], data: [[1, 2, 3], [4, 5, 6]] }
+
+  assertEquals(matVecMul(left, right), { shape: [3], data: [9, 12, 15] })
+})
+

@@ -1,6 +1,6 @@
 import type { MetoriAdapter, SupportedOperations } from '../shared.ts'
 import type { AnyShapeJSArray, TensorShape, CalculatingNode, AnyShapeJSArrayOrNumber } from '../../types.ts'
-import { add, dot, matmul, ones, sub, zeros } from './operands.ts'
+import { add, dot, matmul, matVecMul, ones, sub, zeros } from './operands.ts'
 
 export type CPUTensor = {
   shape: TensorShape
@@ -95,8 +95,18 @@ class CPUAdapter implements MetoriAdapter {
         }
         return this.#createTensorFromCPUTensor(matmul(leftTensor, rightTensor))
       }
+      case 'matVecMul': {
+        const leftId = this.calculate(tree.left)
+        const rightId = this.calculate(tree.right)
+        const leftTensor = this.#tensors.get(leftId)
+        const rightTensor = this.#tensors.get(rightId)
+        if (!leftTensor || !rightTensor) {
+          throw new Error('Tensor not found')
+        }
+        return this.#createTensorFromCPUTensor(matVecMul(leftTensor, rightTensor))
+      }
     }
-    throw new TypeError('calculate failed.')
+    throw new TypeError(`The operation ${(tree as { type: string }).type} is not supported.`)
   }
 
   getShape(id: number) {

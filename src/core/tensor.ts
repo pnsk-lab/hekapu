@@ -60,6 +60,14 @@ abstract class TensorBase<Shape extends TensorShape> {
       right: tensor.tree,
     }, this.#adapter)
   }
+
+  matVecMul<O extends number>(tensor: CalculatingTensor<[Shape[0], O]> | Tensor<[Shape[0], O]>): CalculatingTensor<[O]> {
+    return new CalculatingTensor({
+      type: 'matVecMul',
+      left: this.tree,
+      right: tensor.tree,
+    }, this.#adapter)
+  }
 }
 
 export class CalculatingTensor<Shape extends TensorShape> extends TensorBase<Shape> {

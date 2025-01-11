@@ -40,4 +40,8 @@ export type CalculatingNode = {
   type: 'matmul'
   left: CalculatingNode
   right: CalculatingNode
+} | {
+  type: 'matVecMul'
+  left: CalculatingNode
+  right: CalculatingNode
 }
