@@ -1,5 +1,4 @@
 import type { MetoriAdapter } from '../adapter/shared.ts'
-import { type GradientFn, useGradient } from './gradient.ts'
 import { type CreateTensor, useTensor } from './tensor.ts'
 import { type CreateZeros, useZeros, type CreateOnes, useOnes } from './use-helpers.ts'
 
@@ -10,7 +9,6 @@ export interface UsedAdapter {
   tensor: CreateTensor
   zeros: CreateZeros
   ones: CreateOnes
-  gradient: GradientFn
 }
 
 /**
@@ -35,6 +33,5 @@ export const useAdapter = (adapter: MetoriAdapter): UsedAdapter => {
     tensor: useTensor(adapter),
     zeros: useZeros(adapter),
     ones: useOnes(adapter),
-    gradient: useGradient(adapter)
   }
 }

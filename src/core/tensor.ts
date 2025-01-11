@@ -13,6 +13,13 @@ abstract class TensorBase<Shape extends TensorShape> {
     }
   }
 
+  backward() {
+    // Convert calculatingHistory to tree for gradient
+    const gradientTree = this.calculatingHistory
+    
+    
+  }
+
   /**
    * Add tensor
    * @param tensor Tensor to add
