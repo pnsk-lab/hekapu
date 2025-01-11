@@ -9,12 +9,16 @@ export const processLR = (leftMatrix: CPUTensor, rightMatrix: CPUTensor, calcula
   }
 
   while (true) {
+    let rightIndex = index
+    if (leftMatrix.shape.length > rightMatrix.shape.length) {
+      // like [1, 2, 3] + 1 or [[1, 2], [3, 4]] + [1, 2]
+      rightIndex = rightIndex.slice(0, rightMatrix.shape.length)
+    }
+
     setArrItemByIndexes(
       leftMatrix.data as AnyShapeJSArray,
       index,
-      (prev) => {
-        return calculate(prev, getArrItemByIndexes(rightMatrix.data as AnyShapeJSArray, index))
-      },
+      (prev) => calculate(prev, getArrItemByIndexes(rightMatrix.data as AnyShapeJSArray, rightIndex))
     )
 
     // Process index

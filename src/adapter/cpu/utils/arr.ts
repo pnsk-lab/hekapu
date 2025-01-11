@@ -1,9 +1,17 @@
-import type { AnyShapeJSArray } from '../../../types.ts'
+import type { AnyShapeJSArray, AnyShapeJSArrayOrNumber } from '../../../types.ts'
 
 export function getArrItemByIndexes(
-  arr: AnyShapeJSArray,
+  arr: AnyShapeJSArrayOrNumber,
   indexes: number[],
 ): number {
+  if (typeof arr === 'number') {
+    if (indexes.length === 0) {
+      return arr
+    } else {
+      throw new Error('Index out of bounds')
+    }
+  }
+
   let item = arr
   for (const index of indexes) {
     const got = item[index]

@@ -8,7 +8,8 @@ const mt = useAdapter(createCPUAdapter())
 const x = mt.tensor([1, 2, 3] as const) // 3 features
 
 const W = mt.tensor([[0.1, 0.2], [0.3, 0.4], [0.5, 0.6]] as const) // 3 features, 2 neurons
+const B = mt.tensor([0.1, 0.2] as const) // 2 neurons
 
-const y = x.matVecMul(W)
+const y = x.matVecMul(W).add(B)
 
 console.log(await y.toArray())
