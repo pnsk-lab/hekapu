@@ -29,11 +29,4 @@ export interface MetoriAdapter {
    * @returns Array
    */
   toArray: (id: number) => Promise<AnyShapeJSArrayOrNumber> | AnyShapeJSArrayOrNumber
-
-  /**
-   * Get tensor shape
-   * @param id Tensor ID
-   * @returns Shape
-   */
-  getShape: (id: number) => Promise<TensorShape> | TensorShape
 }

@@ -1,4 +1,5 @@
-import type { Tensor } from './core/tensor.ts'
+import { MetoriAdapter } from './adapter/shared.ts'
+import type { ResolvedTensor } from './core/tensor.ts'
 
 export type TensorShape = number[]
 
@@ -15,6 +16,10 @@ export type GetShape<T extends AnyShapeJSArray> = T extends { length: infer L }
     : [L]
   : []
 
+export type Compatible<T extends any[]> = 
+  (T extends [...infer Rest, infer Last]
+    ? Compatible<Rest> | T
+    : []) | [];
 export type CalculatingNode = {
   type: 'tensor'
   id: number
@@ -28,10 +33,10 @@ export type CalculatingNode = {
   right: CalculatingNode
 } | {
   type: 'zeros'
-  shape: TensorShape
+  shape: TensorShape | CalculatingNode
 } | {
   type: 'ones'
-  shape: TensorShape
+  shape: TensorShape | CalculatingNode
 } | {
   type: 'dot'
   left: CalculatingNode
@@ -44,4 +49,20 @@ export type CalculatingNode = {
   type: 'matVecMul'
   left: CalculatingNode
   right: CalculatingNode
+} | {
+  type: 'shape'
+  input: CalculatingNode
+}
+
+export interface TensorOptions {
+  /**
+   * Whether to automatically calculate gradients
+   * @default false
+   */
+  autoGrad?: boolean
+}
+
+export interface TensorInternalOptions {
+  adapter: MetoriAdapter
+  calculatingHistory?: CalculatingNode
 }

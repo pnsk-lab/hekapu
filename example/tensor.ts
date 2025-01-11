@@ -3,13 +3,8 @@ import createCPUAdapter from '@pnsk-lab/metori/adapter/cpu'
 
 const mt = useAdapter(createCPUAdapter())
 
-// Simple a layer of neural network, not including activation function and bias
+const x = mt.tensor([1, 2, 3] as const, { autoGrad: true })
+const b = mt.tensor(1)
+const y = x.add(b)
 
-const x = mt.tensor([1, 2, 3] as const) // 3 features
-
-const W = mt.tensor([[0.1, 0.2], [0.3, 0.4], [0.5, 0.6]] as const) // 3 features, 2 neurons
-const B = mt.tensor([0.1, 0.2] as const) // 2 neurons
-
-const y = x.matVecMul(W).add(B)
-
-console.log(await y.toArray())
+console.log(await y)

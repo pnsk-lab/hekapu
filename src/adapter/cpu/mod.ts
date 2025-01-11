@@ -11,7 +11,7 @@ export type CPUTensor = {
 }
 class CPUAdapter implements MetoriAdapter {
   name = 'metori/cpu'
-  supportedOperations: SupportedOperations = new Set(['add', 'sub', 'zeros', 'ones', 'dot', 'matmul'])
+  supportedOperations: SupportedOperations = new Set(['add', 'sub', 'zeros', 'ones', 'dot', 'matmul', 'shape'])
 
   #tensors = new Map<number, CPUTensor>()
   #id = 0
@@ -67,12 +67,12 @@ class CPUAdapter implements MetoriAdapter {
       }
       case 'zeros': {
         const shape = tree.shape
-        const data = zeros(shape)
+        const data = zeros(Array.isArray(shape) ? shape : (this.toArray(this.calculate(shape)) as TensorShape))
         return this.createTensorFromArray(data)
       }
       case 'ones': {
         const shape = tree.shape
-        const data = ones(shape)
+        const data = ones(Array.isArray(shape) ? shape : (this.toArray(this.calculate(shape)) as TensorShape))
         return this.createTensorFromArray(data)
       }
       case 'dot': {
@@ -105,16 +105,16 @@ class CPUAdapter implements MetoriAdapter {
         }
         return this.#createTensorFromCPUTensor(matVecMul(leftTensor, rightTensor))
       }
+      case 'shape': {
+        const input = this.calculate(tree.input)
+        const inputTensor = this.#tensors.get(input)
+        if (!inputTensor) {
+          throw new Error('Tensor not found')
+        }
+        return this.createTensorFromArray(inputTensor.shape)
+      }
     }
     throw new TypeError(`The operation ${(tree as { type: string }).type} is not supported.`)
-  }
-
-  getShape(id: number) {
-    const tensor = this.#tensors.get(id)
-    if (!tensor) {
-      throw new Error('Tensor not found')
-    }
-    return tensor.shape
   }
 
   toArray(id: number) {
