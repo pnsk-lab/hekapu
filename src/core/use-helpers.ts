@@ -10,7 +10,10 @@ export const useZeros = (adapter: MetoriAdapter): CreateZeros => {
     return new CalculatingTensor({
       type: 'zeros',
       shape
-    }, adapter)
+    }, {
+      adapter,
+      calculatingHistory: undefined,
+    })
   }
 }
 
@@ -22,7 +25,10 @@ export const useOnes = (adapter: MetoriAdapter): CreateOnes => {
     return new CalculatingTensor({
       type: 'ones',
       shape
-    }, adapter)
+    }, {
+      adapter,
+      calculatingHistory: undefined,
+    })
   }
 }
 

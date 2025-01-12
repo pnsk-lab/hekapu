@@ -3,11 +3,16 @@ import type { CPUTensor } from './mod.ts'
 import { getArrItemByIndexes, setArrItemByIndexes } from './utils/arr.ts'
 
 export const processLR = (leftMatrix: CPUTensor, rightMatrix: CPUTensor, calculate: (left: number, right: number) => number) => {
+  if (leftMatrix.shape.length === 0 && rightMatrix.shape.length === 0) {
+    return {
+      shape: [],
+      data: calculate(leftMatrix.data as number, rightMatrix.data as number)
+    }
+  }
   const index: number[] = []
   for (let i = 0; i < leftMatrix.shape.length; i++) {
     index.push(0)
   }
-
   while (true) {
     let rightIndex = index
     if (leftMatrix.shape.length > rightMatrix.shape.length) {
@@ -47,6 +52,9 @@ export const sub = (leftMatrix: CPUTensor, rightMatrix: CPUTensor) => {
   })
 }
 export const zeros = (shape: TensorShape, target: AnyShapeJSArray = []) => {
+  if (shape.length === 0) {
+    return 0
+  }
   for (let i = 0; i < shape[0]; i++) {
     if (shape.length > 1) {
       const thisTarget: AnyShapeJSArray = []
@@ -59,6 +67,9 @@ export const zeros = (shape: TensorShape, target: AnyShapeJSArray = []) => {
   return target
 }
 export const ones = (shape: TensorShape, target: AnyShapeJSArray = []) => {
+  if (shape.length === 0) {
+    return 1
+  }
   for (let i = 0; i < shape[0]; i++) {
     if (shape.length > 1) {
       const thisTarget: AnyShapeJSArray = []
