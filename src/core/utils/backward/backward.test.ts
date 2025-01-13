@@ -24,4 +24,20 @@ Deno.test('buildGradientTree', async (t) => {
     const result = await cpu.toArray(await cpu.calculate(gradientTree))
     assertEquals(result, 1)
   })
+  await t.step('Vector dot product', async () => {
+    const tape: CalculatingNode = {
+      type: 'dot',
+      left: {
+        type: 'tensor',
+        id: 0,
+      },
+      right: {
+        type: 'tensor',
+        id: 1,
+      },
+    }
+    const gradientTree = buildGradientTree(tape, 0)
+    const result = await cpu.toArray(await cpu.calculate(gradientTree))
+    assertEquals(result, 1)
+  })
 })
