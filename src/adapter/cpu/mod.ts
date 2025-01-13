@@ -1,6 +1,7 @@
 import type { MetoriAdapter, SupportedOperations } from '../shared.ts'
 import type { AnyShapeJSArray, TensorShape, CalculatingNode, AnyShapeJSArrayOrNumber } from '../../types.ts'
 import { add, dot, matmul, matVecMul, ones, sub, zeros } from './operands.ts'
+import { grad } from './grad.ts'
 
 export type CPUTensor = {
   shape: TensorShape
@@ -9,7 +10,7 @@ export type CPUTensor = {
   shape: TensorShape & { length: 0 }
   data: number
 }
-class CPUAdapter implements MetoriAdapter {
+export class CPUAdapter implements MetoriAdapter {
   name = 'metori/cpu'
   supportedOperations: SupportedOperations = new Set(['add', 'sub', 'zeros', 'ones', 'dot', 'matmul', 'shape'])
 
@@ -39,10 +40,10 @@ class CPUAdapter implements MetoriAdapter {
   }
 
   calculate(tree: CalculatingNode) {
-    if ('id' in tree) {
-      return tree.id
-    }
     switch (tree.type) {
+      case 'tensor': {
+        return tree.id
+      }
       case 'add': {
         const leftId = this.calculate(tree.left)
         const rightId = this.calculate(tree.right)
@@ -115,6 +116,10 @@ class CPUAdapter implements MetoriAdapter {
       }
     }
     throw new TypeError(`The operation ${(tree as { type: string }).type} is not supported.`)
+  }
+
+  calculateGradient(calculatingNode: CalculatingNode) {
+    return grad(this.#tensors, calculatingNode, this)
   }
 
   toArray(id: number) {

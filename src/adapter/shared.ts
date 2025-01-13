@@ -14,7 +14,7 @@ export interface MetoriAdapter {
    * @param input Input JS array
    * @returns Tensor ID
    */
-  createTensorFromArray: (input: AnyShapeJSArray) => number
+  createTensorFromArray: (input: AnyShapeJSArrayOrNumber) => number
 
   /**
    * Calculate tensor
@@ -22,6 +22,13 @@ export interface MetoriAdapter {
    * @returns Calculated tensor
    */
   calculate: (tree: CalculatingNode) => Promise<number> | number
+
+  /**
+   * Calculate gradient
+   * @param tree Calculating tree
+   * @returns Gradient
+   */
+  calculateGradient: (tree: CalculatingNode) => Promise<Map<number, number>> | Map<number, number>
 
   /**
    * Convert tensor to array

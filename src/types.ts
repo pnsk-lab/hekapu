@@ -1,5 +1,5 @@
 import { MetoriAdapter } from './adapter/shared.ts'
-import type { ResolvedTensor } from './core/tensor.ts'
+import type { ResolvedTensor, Tensor } from './core/tensor.ts'
 
 export type TensorShape = number[]
 
@@ -20,9 +20,12 @@ export type Compatible<T extends any[]> =
   (T extends [...infer Rest, infer Last]
     ? Compatible<Rest> | T
     : []) | [];
+
 export type CalculatingNode = {
   type: 'tensor'
   id: number
+
+  requiresGrad?: boolean
 } | {
   type: 'add'
   left: CalculatingNode

@@ -5,12 +5,16 @@ abstract class TensorBase<Shape extends TensorShape> {
   abstract tree: CalculatingNode
   #adapter: MetoriAdapter
 
-  readonly calculatingHistory?: CalculatingNode
+  calculatingHistory?: CalculatingNode
   constructor(options: TensorInternalOptions) {
     this.#adapter = options.adapter
     if (options.calculatingHistory) {
       this.calculatingHistory = options.calculatingHistory
     }
+  }
+
+  get requiresGrad(): boolean {
+    return !!this.calculatingHistory
   }
 
   backward() {
@@ -175,7 +179,7 @@ export class ResolvedTensor<Shape extends TensorShape> extends TensorBase<Shape>
     this.#adapter = options.adapter
     this.tree = {
       type: 'tensor',
-      id,
+      id: this.id,
     }
   }
 
@@ -195,12 +199,16 @@ export const useTensor = (adapter: MetoriAdapter): CreateTensor => {
   // @ts-ignore be quiet!!
   return (input, options = {}) => {
     const id = adapter.createTensorFromArray(input)
-    return new ResolvedTensor(id, {
-      adapter,
-      calculatingHistory: options.autoGrad ? {
-        type: 'tensor',
-        id,
-      } : undefined,
+    const tensor = new ResolvedTensor(id, {
+      adapter
     })
+    if (options.autoGrad) {
+      tensor.calculatingHistory = {
+        type: 'tensor',
+        id: tensor.id,
+        requiresGrad: true
+      }
+    }
+    return tensor
   }
 }
