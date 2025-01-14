@@ -119,7 +119,7 @@ export class CPUAdapter implements MetoriAdapter {
   }
 
   calculateGradient(calculatingNode: CalculatingNode) {
-    return grad(this.#tensors, calculatingNode, this)
+    return grad(this, this.#tensors, calculatingNode)
   }
 
   toArray(id: number) {
