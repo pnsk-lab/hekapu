@@ -34,9 +34,9 @@ Deno.test('calculateGradient', async (t) => {
     assertEquals(grads[x].data, 1)
     assertEquals(grads[y].data, 2)
   })
-  /*await t.step('Simple dot product', () => {
+  await t.step('Simple dot product', () => {
     const adapter = new CPUAdapter()
-    const x = adapter.createTensorFromArray([1, 2 ])
+    const x = adapter.createTensorFromArray([1, 2])
     const b = adapter.createTensorFromArray([3, 4])
     const y: CalculatingNode = {
       type: 'dot',
@@ -44,6 +44,7 @@ Deno.test('calculateGradient', async (t) => {
       right: { type: 'tensor', id: b, requiresGrad: true },
     }
     const grads = adapter.calculateGradient(y)
-    console.log(grads)
-  })*/
+    assertEquals(grads[x].data, [3, 4])
+    assertEquals(grads[b].data, [1, 2])
+  })
 })
