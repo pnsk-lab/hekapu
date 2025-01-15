@@ -76,10 +76,12 @@ Deno.test('sub', () => {
 
 Deno.test('zeros', () => {
   assertEquals(zeros([2, 2]), [[0, 0], [0, 0]])
+  assertEquals(zeros([]), 0)
 })
 
 Deno.test('ones', () => {
   assertEquals(ones([2, 2]), [[1, 1], [1, 1]])
+  assertEquals(ones([]), 1)
 })
 
 Deno.test('matmul', () => {

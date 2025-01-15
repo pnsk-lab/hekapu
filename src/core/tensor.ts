@@ -1,12 +1,20 @@
 import type { MetoriAdapter } from '../adapter/shared.ts'
-import type { AnyShapeJSArray, GetShape, TensorShape, CalculatingNode } from '../types.ts'
+import type { Compatible, GetShape, TensorShape, CalculatingNode, TensorOptions, TensorInternalOptions } from '../types.ts'
 
 abstract class TensorBase<Shape extends TensorShape> {
   abstract tree: CalculatingNode
-  shape?: Shape
   #adapter: MetoriAdapter
-  constructor(adapter: MetoriAdapter) {
-    this.#adapter = adapter
+
+  calculatingHistory?: CalculatingNode
+  constructor(options: TensorInternalOptions) {
+    this.#adapter = options.adapter
+    if (options.calculatingHistory) {
+      this.calculatingHistory = options.calculatingHistory
+    }
+  }
+
+  get requiresGrad(): boolean {
+    return !!this.calculatingHistory
   }
 
   /**
@@ -14,12 +22,19 @@ abstract class TensorBase<Shape extends TensorShape> {
    * @param tensor Tensor to add
    * @returns CalculatingTensor
    */
-  add(tensor: CalculatingTensor<Shape> | Tensor<Shape>) {
+  add(tensor: CalculatingTensor<Compatible<Shape>> | ResolvedTensor<Compatible<Shape>>) {
     return new CalculatingTensor({
       type: 'add',
       left: this.tree,
       right: tensor.tree,
-    }, this.#adapter)
+    }, {
+      adapter: this.#adapter,
+      calculatingHistory: this.calculatingHistory ? {
+        type: 'add',
+        left: this.calculatingHistory,
+        right: tensor.tree,
+      } : undefined,
+    })
   }
 
   /**
@@ -27,12 +42,19 @@ abstract class TensorBase<Shape extends TensorShape> {
    * @param tensor Tensor to subtract
    * @returns CalculatingTensor
    */
-  sub(tensor: CalculatingTensor<Shape> | Tensor<Shape>) {
+  sub(tensor: CalculatingTensor<Shape> | ResolvedTensor<Shape>) {
     return new CalculatingTensor({
       type: 'sub',
       left: this.tree,
       right: tensor.tree,
-    }, this.#adapter)
+    }, {
+      adapter: this.#adapter,
+      calculatingHistory: this.calculatingHistory ? {
+        type: 'sub',
+        left: this.calculatingHistory,
+        right: tensor.tree,
+      } : undefined,
+    })
   }
 
   /**
@@ -40,12 +62,19 @@ abstract class TensorBase<Shape extends TensorShape> {
    * @param tensor Vector to dot product
    * @returns CalculatingTensor
    */
-  dot(tensor: CalculatingTensor<Shape> | Tensor<Shape>) {
+  dot(tensor: CalculatingTensor<Shape> | ResolvedTensor<Shape>) {
     return new CalculatingTensor({
       type: 'dot',
       left: this.tree,
       right: tensor.tree,
-    }, this.#adapter)
+    }, {
+      adapter: this.#adapter,
+      calculatingHistory: this.calculatingHistory ? {
+        type: 'dot',
+        left: this.calculatingHistory,
+        right: tensor.tree,
+      } : undefined,
+    })
   }
 
   /**
@@ -53,40 +82,70 @@ abstract class TensorBase<Shape extends TensorShape> {
    * @param tensor Tensor to multiply
    * @returns CalculatingTensor
    */
-  matmul(tensor: CalculatingTensor<Shape> | Tensor<Shape>) {
+  matmul(tensor: CalculatingTensor<Shape> | ResolvedTensor<Shape>) {
     return new CalculatingTensor({
       type: 'matmul',
       left: this.tree,
       right: tensor.tree,
-    }, this.#adapter)
+    }, {
+      adapter: this.#adapter,
+      calculatingHistory: this.calculatingHistory ? {
+        type: 'matmul',
+        left: this.calculatingHistory,
+        right: tensor.tree,
+      } : undefined,
+    })
   }
 
-  matVecMul<O extends number>(tensor: CalculatingTensor<[Shape[0], O]> | Tensor<[Shape[0], O]>): CalculatingTensor<[O]> {
+  matVecMul<O extends number>(tensor: CalculatingTensor<[Shape[0], O]> | ResolvedTensor<[Shape[0], O]>): CalculatingTensor<[O]> {
     return new CalculatingTensor({
       type: 'matVecMul',
       left: this.tree,
       right: tensor.tree,
-    }, this.#adapter)
+    }, {
+      adapter: this.#adapter,
+      calculatingHistory: this.calculatingHistory ? {
+        type: 'matVecMul',
+        left: this.calculatingHistory,
+        right: tensor.tree,
+      } : undefined,
+    })
+  }
+
+  shape(): CalculatingTensor<Shape> {
+    return new CalculatingTensor({
+      type: 'shape',
+      input: this.tree,
+    }, {
+      adapter: this.#adapter,
+      calculatingHistory: this.calculatingHistory ? {
+        type: 'shape',
+        input: this.calculatingHistory,
+      } : undefined,
+    })
   }
 }
 
 export class CalculatingTensor<Shape extends TensorShape> extends TensorBase<Shape> {
   #adapter: MetoriAdapter
   tree: CalculatingNode
-  constructor(tree: CalculatingNode, adapter: MetoriAdapter) {
-    super(adapter)
+  constructor(tree: CalculatingNode, options: TensorInternalOptions) {
+    super(options)
     this.tree = tree
-    this.#adapter = adapter
+    this.#adapter = options.adapter
   }
 
-  async calculate(): Promise<Tensor<Shape>> {
+  async calculate(): Promise<ResolvedTensor<Shape>> {
     const id = await this.#adapter.calculate(this.tree)
-    return new Tensor(id, this.#adapter)
+    return new ResolvedTensor(id, {
+      adapter: this.#adapter,
+      calculatingHistory: this.calculatingHistory,
+    })
   }
 
-  then<TResult1 = Tensor<Shape>, TResult2 = never>(
+  then<TResult1 = ResolvedTensor<Shape>, TResult2 = never>(
     onfulfilled?:
-      | ((value: Tensor<Shape>) => TResult1 | PromiseLike<TResult1>)
+      | ((value: ResolvedTensor<Shape>) => TResult1 | PromiseLike<TResult1>)
       | undefined
       | null,
     onrejected?:
@@ -97,31 +156,24 @@ export class CalculatingTensor<Shape extends TensorShape> extends TensorBase<Sha
     return this.calculate().then(onfulfilled, onrejected)
   }
 
-  async getShape(): Promise<Shape> {
-    return await this.calculate().then((m) => m.getShape())
-  }
   async toArray() {
     return await this.calculate().then((m) => m.toArray())
   }
 }
 
-export class Tensor<Shape extends TensorShape> extends TensorBase<Shape> {
+export class ResolvedTensor<Shape extends TensorShape> extends TensorBase<Shape> {
   id: number
   #adapter: MetoriAdapter
   tree: CalculatingNode
-  constructor(id: number, adapter: MetoriAdapter) {
-    super(adapter)
+  constructor(id: number, options: TensorInternalOptions) {
+    super(options)
 
     this.id = id
-    this.#adapter = adapter
+    this.#adapter = options.adapter
     this.tree = {
       type: 'tensor',
-      id,
+      id: this.id,
     }
-  }
-
-  async getShape(): Promise<Shape> {
-    return await this.#adapter.getShape(this.id) as Shape
   }
 
   async toArray() {
@@ -129,15 +181,27 @@ export class Tensor<Shape extends TensorShape> extends TensorBase<Shape> {
   }
 }
 
+export type Tensor<Shape extends TensorShape> = CalculatingTensor<Shape> | ResolvedTensor<Shape>
+
 export interface CreateTensor {
   // @ts-ignore pls tell me how to fix this
-  <T extends AnyShapeJSArray>(input: T): Tensor<GetShape<T>>
+  <T extends AnyShapeJSArrayOrNumber>(input: T, options?: TensorOptions): ResolvedTensor<GetShape<T>>
 }
 
 export const useTensor = (adapter: MetoriAdapter): CreateTensor => {
   // @ts-ignore be quiet!!
-  return (input) => {
+  return (input, options = {}) => {
     const id = adapter.createTensorFromArray(input)
-    return new Tensor(id, adapter)
+    const tensor = new ResolvedTensor(id, {
+      adapter
+    })
+    if (options.requiresGrad) {
+      tensor.calculatingHistory = {
+        type: 'tensor',
+        id: tensor.id,
+        requiresGrad: true
+      }
+    }
+    return tensor
   }
 }
