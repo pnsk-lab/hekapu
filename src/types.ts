@@ -62,7 +62,7 @@ export interface TensorOptions {
    * Whether to automatically calculate gradients
    * @default false
    */
-  autoGrad?: boolean
+  requiresGrad?: boolean
 }
 
 export interface TensorInternalOptions {

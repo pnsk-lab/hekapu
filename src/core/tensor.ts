@@ -17,13 +17,6 @@ abstract class TensorBase<Shape extends TensorShape> {
     return !!this.calculatingHistory
   }
 
-  backward() {
-    // Convert calculatingHistory to tree for gradient
-    const gradientTree = this.calculatingHistory
-    
-    
-  }
-
   /**
    * Add tensor
    * @param tensor Tensor to add
@@ -192,7 +185,7 @@ export type Tensor<Shape extends TensorShape> = CalculatingTensor<Shape> | Resol
 
 export interface CreateTensor {
   // @ts-ignore pls tell me how to fix this
-  <T extends AnyShapeJSArrayOrNumber>(input: T, options?: TensorOptions): Tensor<GetShape<T>>
+  <T extends AnyShapeJSArrayOrNumber>(input: T, options?: TensorOptions): ResolvedTensor<GetShape<T>>
 }
 
 export const useTensor = (adapter: MetoriAdapter): CreateTensor => {
@@ -202,7 +195,7 @@ export const useTensor = (adapter: MetoriAdapter): CreateTensor => {
     const tensor = new ResolvedTensor(id, {
       adapter
     })
-    if (options.autoGrad) {
+    if (options.requiresGrad) {
       tensor.calculatingHistory = {
         type: 'tensor',
         id: tensor.id,

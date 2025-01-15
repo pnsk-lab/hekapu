@@ -1,4 +1,7 @@
-import type { AnyShapeJSArrayOrNumber, CalculatingNode } from '../../types.ts'
+import { ResolvedTensor } from '../../core/tensor.ts'
+import type { Tensor } from '../../mod.ts'
+import type { CalculatingNode, TensorShape } from '../../types.ts'
+import type { MetoriAdapter } from '../shared.ts'
 import type { CPUAdapter, CPUTensor } from './mod.ts'
 import { add, dot } from './operands.ts'
 
@@ -7,7 +10,7 @@ export function grad(
   adapter: CPUAdapter,
   tensors: Map<number, CPUTensor>,
   y: CalculatingNode,
-): Record<number, CPUTensor> {
+): Record<number, Tensor<TensorShape>> {
   // First, forward it.
   const forwardedTensors = new Map<CalculatingNode | number, CPUTensor>()
   const getForwardedTensor = (node: CalculatingNode): CPUTensor => {
@@ -99,5 +102,11 @@ export function grad(
   }
   backward(y)
 
-  return Object.fromEntries([...grads].filter(([key]) => typeof key === 'number'))
+  return Object.fromEntries(
+    [...grads]
+      .filter(([key]) => typeof key === 'number')
+      .map(([k, v]) => [k, new ResolvedTensor(adapter.createTensorFromArray(v.data), {
+        adapter: adapter as MetoriAdapter
+      })])
+  )
 }

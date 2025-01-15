@@ -1,5 +1,6 @@
 import type { MetoriAdapter } from '../adapter/shared.ts'
 import { type CreateTensor, useTensor } from './tensor.ts'
+import { useBackward, type Backward } from './use-backward.ts'
 import { type CreateZeros, useZeros, type CreateOnes, useOnes } from './use-helpers.ts'
 
 /**
@@ -7,6 +8,7 @@ import { type CreateZeros, useZeros, type CreateOnes, useOnes } from './use-help
  */
 export interface UsedAdapter {
   tensor: CreateTensor
+  backward: Backward
   zeros: CreateZeros
   ones: CreateOnes
 }
@@ -31,6 +33,7 @@ export interface UsedAdapter {
 export const useAdapter = (adapter: MetoriAdapter): UsedAdapter => {
   return {
     tensor: useTensor(adapter),
+    backward: useBackward(adapter),
     zeros: useZeros(adapter),
     ones: useOnes(adapter),
   }
