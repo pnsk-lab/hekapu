@@ -124,11 +124,15 @@ export function grad(
 
         /** Matrix A */
         let matrix = left
+        let matrixNode = node.left
         /** Vector x */
         let vector = right
+        let vectorNode = node.right
         if (right.shape.length === 2) {
           matrix = right
           vector = left
+          matrixNode = node.right
+          vectorNode = node.left
         }
 
         const gradA: CPUTensor = {
@@ -138,7 +142,7 @@ export function grad(
         for (let i = 0; i < matrix.shape[0]; i++) {
           (gradA.data as number[][]).push([...vector.data as number[]])
         }
-        setGradByNode(node.left, add(getGradByNode(node.left), gradA))
+        setGradByNode(matrixNode, add(getGradByNode(matrixNode), gradA))
 
         const gradX: CPUTensor = {
           data: [],
@@ -151,7 +155,7 @@ export function grad(
           }
           ;(gradX.data as number[]).push(sum)
         }
-        setGradByNode(node.right, add(getGradByNode(node.right), gradX))
+        setGradByNode(vectorNode, add(getGradByNode(vectorNode), gradX))
 
         backward(node.left)
         backward(node.right)
