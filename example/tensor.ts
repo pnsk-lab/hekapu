@@ -3,10 +3,11 @@ import createCPUAdapter from '@pnsk-lab/metori/adapter/cpu'
 
 const mt = useAdapter(createCPUAdapter())
 
-const x = mt.tensor([1, 2, 3] as const, { requiresGrad: true })
-const b = mt.tensor(1)
-const y = x.add(x).add(b)
+const x = mt.tensor([1, 2])
+
+const w = mt.tensor([[1], [2]], { requiresGrad: true })
+
+const y = w.matVecMul(x)
 
 const grads = await mt.backward(y)
-
-console.log(await grads.refer(x).toArray())
+console.log(await grads.refer(w).toArray())

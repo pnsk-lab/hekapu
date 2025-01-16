@@ -159,28 +159,31 @@ export const matVecMul = (
   let matrix: CPUTensor
   let vector: CPUTensor
   if (leftTensor.shape.length === 1) {
-    if (rightTensor.shape.length !== 2) {
-      throw new Error('Vector must be a 1D tensor')
-    }
     matrix = rightTensor
     vector = leftTensor
-  } else if (rightTensor.shape.length === 1) {
-    if (leftTensor.shape.length !== 2) {
-      throw new Error('Vector must be a 1D tensor')
-    }
+  } else {
     matrix = leftTensor
     vector = rightTensor
-  } else {
-    throw new Error('matVecMul is only supported for 2D matrix and 1D vector')
   }
 
-  const outputShape = [matrix.shape[1]]
+  if (matrix.shape.length !== 2 || vector.shape.length !== 1) {
+    throw new Error('The operands must be a matrix and a vector')
+  }
+
+  if (matrix.shape[0] !== vector.shape[0]) {
+    throw new Error('Matrix and vector must have compatible dimensions')
+  }
+
+  const inputLength = vector.shape[0]
+  const outputLength = matrix.shape[1]
+  const outputShape = [outputLength]
 
   const result: number[] = []
-  for (let i = 0; i < outputShape[0]; i++) {
+  // output length is same as vector length
+  for (let i = 0; i < outputLength; i++) {
     let sum = 0
-    for (let j = 0; j < matrix.shape[0]; j++) {
-      sum += (matrix.data as number[][])[j][i] * (vector.data as number[])[j]
+    for (let j = 0; j < inputLength; j++) {
+      sum += (vector.data as number[])[j] * (matrix.data as number[][])[j][i]
     }
     result.push(sum)
   }

@@ -3,7 +3,7 @@ import type { Tensor } from '../../mod.ts'
 import type { CalculatingNode, TensorShape } from '../../types.ts'
 import type { MetoriAdapter } from '../shared.ts'
 import type { CPUAdapter, CPUTensor } from './mod.ts'
-import { add, dot } from './operands.ts'
+import { add, dot, matVecMul, sub } from './operands.ts'
 
 // Reverse-mode automatic differentiation
 export function grad(
@@ -34,6 +34,20 @@ export function grad(
         const left = forward(node.left)
         const right = forward(node.right)
         const tensor = add(left, right)
+        forwardedTensors.set(node, tensor)
+        return tensor
+      }
+      case 'sub': {
+        const left = forward(node.left)
+        const right = forward(node.right)
+        const tensor = sub(left, right)
+        forwardedTensors.set(node, tensor)
+        return tensor
+      }
+      case 'matVecMul': {
+        const left = forward(node.left)
+        const right = forward(node.right)
+        const tensor = matVecMul(left, right)
         forwardedTensors.set(node, tensor)
         return tensor
       }
@@ -93,6 +107,36 @@ export function grad(
           node.right,
           add(getGradByNode(node.right), { shape: [], data: 1 }),
         )
+        backward(node.left)
+        backward(node.right)
+        break
+      }
+      case 'sub': {
+        setGradByNode(node.left, add(getGradByNode(node.left), { shape: [], data: 1 }))
+        setGradByNode(node.right, add(getGradByNode(node.right), { shape: [], data: -1 }))
+        backward(node.left)
+        backward(node.right)
+        break
+      }
+      case 'matVecMul': {
+        const left = getForwardedTensor(node.left)
+        const right = getForwardedTensor(node.right)
+
+        /** Matrix A */
+        let matrix = left
+        /** Vector x */
+        let vector = right
+        if (right.shape.length === 2) {
+          matrix = right
+          vector = left
+        }
+
+        const gradA = matVecMul(getGradByNode(node.left), right)
+        setGradByNode(node.left, add(getGradByNode(node.left), gradA))
+
+        const gradX = matVecMul(left, getGradByNode(node.right))
+        setGradByNode(node.right, add(getGradByNode(node.right), gradX))
+
         backward(node.left)
         backward(node.right)
         break
