@@ -1,5 +1,10 @@
 import type { MetoriAdapter, SupportedOperations } from '../shared.ts'
-import type { AnyShapeJSArray, TensorShape, CalculatingNode, AnyShapeJSArrayOrNumber } from '../../types.ts'
+import type {
+  AnyShapeJSArray,
+  AnyShapeJSArrayOrNumber,
+  CalculatingNode,
+  TensorShape,
+} from '../../types.ts'
 import { add, dot, matmul, matVecMul, ones, sub, zeros } from './operands.ts'
 import { grad } from './grad.ts'
 
@@ -12,7 +17,15 @@ export type CPUTensor = {
 }
 export class CPUAdapter implements MetoriAdapter {
   name = 'metori/cpu'
-  supportedOperations: SupportedOperations = new Set(['add', 'sub', 'zeros', 'ones', 'dot', 'matmul', 'shape'])
+  supportedOperations: SupportedOperations = new Set([
+    'add',
+    'sub',
+    'zeros',
+    'ones',
+    'dot',
+    'matmul',
+    'shape',
+  ])
 
   #tensors = new Map<number, CPUTensor>()
   #id = 0
@@ -68,12 +81,20 @@ export class CPUAdapter implements MetoriAdapter {
       }
       case 'zeros': {
         const shape = tree.shape
-        const data = zeros(Array.isArray(shape) ? shape : (this.toArray(this.calculate(shape)) as TensorShape))
+        const data = zeros(
+          Array.isArray(shape)
+            ? shape
+            : (this.toArray(this.calculate(shape)) as TensorShape),
+        )
         return this.createTensorFromArray(data)
       }
       case 'ones': {
         const shape = tree.shape
-        const data = ones(Array.isArray(shape) ? shape : (this.toArray(this.calculate(shape)) as TensorShape))
+        const data = ones(
+          Array.isArray(shape)
+            ? shape
+            : (this.toArray(this.calculate(shape)) as TensorShape),
+        )
         return this.createTensorFromArray(data)
       }
       case 'dot': {
@@ -104,7 +125,9 @@ export class CPUAdapter implements MetoriAdapter {
         if (!leftTensor || !rightTensor) {
           throw new Error('Tensor not found')
         }
-        return this.#createTensorFromCPUTensor(matVecMul(leftTensor, rightTensor))
+        return this.#createTensorFromCPUTensor(
+          matVecMul(leftTensor, rightTensor),
+        )
       }
       case 'shape': {
         const input = this.calculate(tree.input)
@@ -115,7 +138,9 @@ export class CPUAdapter implements MetoriAdapter {
         return this.createTensorFromArray(inputTensor.shape)
       }
     }
-    throw new TypeError(`The operation ${(tree as { type: string }).type} is not supported.`)
+    throw new TypeError(
+      `The operation ${(tree as { type: string }).type} is not supported.`,
+    )
   }
 
   calculateGradient(calculatingNode: CalculatingNode) {

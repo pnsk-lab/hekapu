@@ -1,7 +1,12 @@
 import type { MetoriAdapter } from '../adapter/shared.ts'
 import { type CreateTensor, useTensor } from './tensor.ts'
-import { useBackward, type Backward } from './use-backward.ts'
-import { type CreateZeros, useZeros, type CreateOnes, useOnes } from './use-helpers.ts'
+import { type Backward, useBackward } from './use-backward.ts'
+import {
+  type CreateOnes,
+  type CreateZeros,
+  useOnes,
+  useZeros,
+} from './use-helpers.ts'
 
 /**
  * UsedAdapter is a wrapper of MetoriAdapter
@@ -17,15 +22,15 @@ export interface UsedAdapter {
  * useAdapter is a function to use MetoriAdapter
  * @param adapter - MetoriAdapter
  * @returns UsedAdapter
- * 
+ *
  * @example
  * ```ts
  * import { useAdapter } from '@pnsk-lab/metori'
  * import createCPUAdapter from '@pnsk-lab/metori/adapter/cpu'
- * 
+ *
  * const adapter = createCPUAdapter()
  * const mt = useAdapter(adapter)
- * 
+ *
  * mt.tensor([1, 2, 3]) // Create Tensor
  * mt.zeros([2, 2]) // Create Tensor with zeros, shape: [2, 2]
  * ```

@@ -1,6 +1,14 @@
 import { assertEquals } from '@std/assert'
 import type { CPUTensor } from './mod.ts'
-import { add, matmul, matVecMul, ones, processLR, sub, zeros } from './operands.ts'
+import {
+  add,
+  matmul,
+  matVecMul,
+  ones,
+  processLR,
+  sub,
+  zeros,
+} from './operands.ts'
 
 Deno.test('processLR', async (t) => {
   await t.step('basic', () => {
@@ -14,12 +22,14 @@ Deno.test('processLR', async (t) => {
     })
 
     assertEquals(
-      processLR(leftMatrix(), rightMatrix(), (left, right) => left + right).data,
+      processLR(leftMatrix(), rightMatrix(), (left, right) => left + right)
+        .data,
       [[6, 8], [10, 12]],
     )
     assertEquals(
-      processLR(leftMatrix(), rightMatrix(), (left, right) => left - right).data,
-        [[-4, -4], [-4, -4]],
+      processLR(leftMatrix(), rightMatrix(), (left, right) => left - right)
+        .data,
+      [[-4, -4], [-4, -4]],
     )
   })
   await t.step('with other shape', () => {
@@ -33,45 +43,55 @@ Deno.test('processLR', async (t) => {
     })
 
     assertEquals(
-      processLR(leftTensor(), rightTensor(), (left, right) =>  left + right).data,
-      [[2, 3], [4, 5]]
+      processLR(leftTensor(), rightTensor(), (left, right) => left + right)
+        .data,
+      [[2, 3], [4, 5]],
     )
   })
 })
 Deno.test('add', () => {
-  assertEquals(add({
-    shape: [2, 2],
-    data: [[1, 2], [3, 4]],
-  }, {
-    shape: [2, 2],
-    data: [[5, 6], [7, 8]],
-  }), {
-    shape: [2, 2],
-    data: [[6, 8], [10, 12]],
-  })
-  assertEquals(add({
-    shape: [2, 2],
-    data: [[1, 2], [3, 4]],
-  }, {
-    shape: [],
-    data: 1,
-  }), {
-    shape: [2, 2],
-    data: [[2, 3], [4, 5]],
-  })
+  assertEquals(
+    add({
+      shape: [2, 2],
+      data: [[1, 2], [3, 4]],
+    }, {
+      shape: [2, 2],
+      data: [[5, 6], [7, 8]],
+    }),
+    {
+      shape: [2, 2],
+      data: [[6, 8], [10, 12]],
+    },
+  )
+  assertEquals(
+    add({
+      shape: [2, 2],
+      data: [[1, 2], [3, 4]],
+    }, {
+      shape: [],
+      data: 1,
+    }),
+    {
+      shape: [2, 2],
+      data: [[2, 3], [4, 5]],
+    },
+  )
 })
 
 Deno.test('sub', () => {
-  assertEquals(sub({
-    shape: [2, 2],
-    data: [[1, 2], [3, 4]],
-  }, {
-    shape: [2, 2],
-    data: [[5, 6], [7, 8]],
-  }), {
-    shape: [2, 2],
-    data: [[-4, -4], [-4, -4]],
-  })
+  assertEquals(
+    sub({
+      shape: [2, 2],
+      data: [[1, 2], [3, 4]],
+    }, {
+      shape: [2, 2],
+      data: [[5, 6], [7, 8]],
+    }),
+    {
+      shape: [2, 2],
+      data: [[-4, -4], [-4, -4]],
+    },
+  )
 })
 
 Deno.test('zeros', () => {
@@ -88,7 +108,10 @@ Deno.test('matmul', () => {
   const left = { shape: [3, 2], data: [[1, 1], [2, 2], [3, 3]] }
   const right = { shape: [2, 2], data: [[1, 2], [3, 4]] }
 
-  assertEquals(matmul(left, right), { shape: [3, 2], data: [[4, 6], [8, 12], [12, 18]] })
+  assertEquals(matmul(left, right), {
+    shape: [3, 2],
+    data: [[4, 6], [8, 12], [12, 18]],
+  })
 })
 
 Deno.test('matVecMul', () => {
@@ -97,4 +120,3 @@ Deno.test('matVecMul', () => {
 
   assertEquals(matVecMul(left, right), { shape: [3], data: [9, 12, 15] })
 })
-

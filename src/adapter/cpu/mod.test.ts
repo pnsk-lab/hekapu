@@ -5,7 +5,7 @@ import { CPUAdapter } from './mod.ts'
 Deno.test('calculateGradient', async (t) => {
   await t.step('f(x, y) = x + y, df/dx = 1, df/dy = 1', async () => {
     const adapter = new CPUAdapter()
-    
+
     const x = adapter.createTensorFromArray(2)
     const y = adapter.createTensorFromArray(2)
     const f: CalculatingNode = {

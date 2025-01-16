@@ -2,11 +2,15 @@ import type { AnyShapeJSArray, TensorShape } from '../../types.ts'
 import type { CPUTensor } from './mod.ts'
 import { getArrItemByIndexes, setArrItemByIndexes } from './utils/arr.ts'
 
-export const processLR = (leftMatrix: CPUTensor, rightMatrix: CPUTensor, calculate: (left: number, right: number) => number) => {
+export const processLR = (
+  leftMatrix: CPUTensor,
+  rightMatrix: CPUTensor,
+  calculate: (left: number, right: number) => number,
+) => {
   if (leftMatrix.shape.length === 0 && rightMatrix.shape.length === 0) {
     return {
       shape: [],
-      data: calculate(leftMatrix.data as number, rightMatrix.data as number)
+      data: calculate(leftMatrix.data as number, rightMatrix.data as number),
     }
   }
   const index: number[] = []
@@ -23,7 +27,11 @@ export const processLR = (leftMatrix: CPUTensor, rightMatrix: CPUTensor, calcula
     setArrItemByIndexes(
       leftMatrix.data as AnyShapeJSArray,
       index,
-      (prev) => calculate(prev, getArrItemByIndexes(rightMatrix.data as AnyShapeJSArray, rightIndex))
+      (prev) =>
+        calculate(
+          prev,
+          getArrItemByIndexes(rightMatrix.data as AnyShapeJSArray, rightIndex),
+        ),
     )
 
     // Process index
@@ -95,19 +103,28 @@ export const dot = (leftMatrix: CPUTensor, rightMatrix: CPUTensor) => {
   const lenA = leftMatrix.shape[0]
   const lenB = leftMatrix.shape[0]
   if (lenA !== lenB) {
-    throw new Error('Dot product is only supported for vectors of the same length')
+    throw new Error(
+      'Dot product is only supported for vectors of the same length',
+    )
   }
 
   let result = 0
   for (let i = 0; i < lenA; i++) {
-    const leftItem = getArrItemByIndexes(leftMatrix.data as AnyShapeJSArray, [i])
-    const rightItem = getArrItemByIndexes(rightMatrix.data as AnyShapeJSArray, [i])
+    const leftItem = getArrItemByIndexes(leftMatrix.data as AnyShapeJSArray, [
+      i,
+    ])
+    const rightItem = getArrItemByIndexes(rightMatrix.data as AnyShapeJSArray, [
+      i,
+    ])
     result += leftItem * rightItem
   }
   return result
 }
 
-export const matmul = (leftMatrix: CPUTensor, rightMatrix: CPUTensor): CPUTensor => {
+export const matmul = (
+  leftMatrix: CPUTensor,
+  rightMatrix: CPUTensor,
+): CPUTensor => {
   const leftShape = leftMatrix.shape
   const rightShape = rightMatrix.shape
   if (leftShape.length !== 2 || rightShape.length !== 2) {
@@ -124,7 +141,8 @@ export const matmul = (leftMatrix: CPUTensor, rightMatrix: CPUTensor): CPUTensor
     for (let j = 0; j < rightShape[1]; j++) {
       let sum = 0
       for (let k = 0; k < leftShape[1]; k++) {
-        sum += ((left[i] as number[])[k] as number) * ((right[k] as number[])[j] as number)
+        sum += ((left[i] as number[])[k] as number) *
+          ((right[k] as number[])[j] as number)
       }
       row.push(sum)
     }
@@ -134,7 +152,10 @@ export const matmul = (leftMatrix: CPUTensor, rightMatrix: CPUTensor): CPUTensor
   return { shape: [leftShape[0], rightShape[1]], data: result }
 }
 
-export const matVecMul = (leftTensor: CPUTensor, rightTensor: CPUTensor): CPUTensor => {
+export const matVecMul = (
+  leftTensor: CPUTensor,
+  rightTensor: CPUTensor,
+): CPUTensor => {
   let matrix: CPUTensor
   let vector: CPUTensor
   if (leftTensor.shape.length === 1) {

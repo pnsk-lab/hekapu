@@ -1,4 +1,7 @@
-import type { AnyShapeJSArray, AnyShapeJSArrayOrNumber } from '../../../types.ts'
+import type {
+  AnyShapeJSArray,
+  AnyShapeJSArrayOrNumber,
+} from '../../../types.ts'
 
 export function getArrItemByIndexes(
   arr: AnyShapeJSArrayOrNumber,

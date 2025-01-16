@@ -49,7 +49,9 @@ export function grad(
         return tensor
       }
       default:
-        throw new Error(`${node.type} is not supported for forward pass to calculate gradients.`)
+        throw new Error(
+          `${node.type} is not supported for forward pass to calculate gradients.`,
+        )
     }
   }
 
@@ -67,7 +69,9 @@ export function grad(
     }
     return grads.get(node.type === 'tensor' ? node.id : node) ?? {
       shape: forwarded.shape,
-      data: adapter.toArray(adapter.calculate({ type: 'zeros', shape: forwarded.shape })),
+      data: adapter.toArray(
+        adapter.calculate({ type: 'zeros', shape: forwarded.shape }),
+      ),
     }
   }
   const setGradByNode = (node: CalculatingNode, grad: CPUTensor) => {
@@ -81,8 +85,14 @@ export function grad(
         break
       }
       case 'add': {
-        setGradByNode(node.left, add(getGradByNode(node.left), { shape: [], data: 1 }))
-        setGradByNode(node.right, add(getGradByNode(node.right), { shape: [], data: 1 }))
+        setGradByNode(
+          node.left,
+          add(getGradByNode(node.left), { shape: [], data: 1 }),
+        )
+        setGradByNode(
+          node.right,
+          add(getGradByNode(node.right), { shape: [], data: 1 }),
+        )
         backward(node.left)
         backward(node.right)
         break
@@ -97,7 +107,9 @@ export function grad(
         break
       }
       default:
-        throw new Error(`${node.type} is not supported for backward pass to calculate gradients.`)
+        throw new Error(
+          `${node.type} is not supported for backward pass to calculate gradients.`,
+        )
     }
   }
   backward(y)
@@ -105,8 +117,13 @@ export function grad(
   return Object.fromEntries(
     [...grads]
       .filter(([key]) => typeof key === 'number')
-      .map(([k, v]) => [k, new ResolvedTensor(adapter.createTensorFromArray(v.data), {
-        adapter: adapter as MetoriAdapter
-      })])
+      .map((
+        [k, v],
+      ) => [
+        k,
+        new ResolvedTensor(adapter.createTensorFromArray(v.data), {
+          adapter: adapter as MetoriAdapter,
+        }),
+      ]),
   )
 }

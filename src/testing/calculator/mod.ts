@@ -13,6 +13,6 @@ export const useCalculator = (adapter: MetoriAdapter): Calculator => {
     async calculate(tree: CalculatingNode) {
       const id = await adapter.calculate(tree)
       return adapter.toArray(id)
-    }
+    },
   }
 }

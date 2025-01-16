@@ -11,15 +11,14 @@ export type TypedJSArray<Shape extends TensorShape> = AnyShapeJSArray & {
   _shape?: Shape
 }
 export type GetShape<T extends AnyShapeJSArray> = T extends { length: infer L }
-  ? T[number] extends Array<any>
-    ? [L, ...GetShape<T[number]>]
-    : [L]
+  ? T[number] extends Array<any> ? [L, ...GetShape<T[number]>]
+  : [L]
   : []
 
-export type Compatible<T extends any[]> = 
-  (T extends [...infer Rest, infer Last]
-    ? Compatible<Rest> | T
-    : []) | [];
+export type Compatible<T extends any[]> =
+  | (T extends [...infer Rest, infer Last] ? Compatible<Rest> | T
+    : [])
+  | []
 
 export type CalculatingNode = {
   type: 'tensor'
