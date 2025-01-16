@@ -170,23 +170,25 @@ export const matVecMul = (
     throw new Error('The operands must be a matrix and a vector')
   }
 
-  if (matrix.shape[0] !== vector.shape[0]) {
+  // (m, n) * (n,) = (m,)
+
+  if (matrix.shape[1] !== vector.shape[0]) {
     throw new Error('Matrix and vector must have compatible dimensions')
   }
 
-  const inputLength = vector.shape[0]
-  const outputLength = matrix.shape[1]
-  const outputShape = [outputLength]
+  const m = matrix.shape[0]
+  const n = matrix.shape[1]
 
   const result: number[] = []
+
   // output length is same as vector length
-  for (let i = 0; i < outputLength; i++) {
+  for (let mi = 0; mi < m; mi++) {
     let sum = 0
-    for (let j = 0; j < inputLength; j++) {
-      sum += (vector.data as number[])[j] * (matrix.data as number[][])[j][i]
+    for (let ni = 0; ni < m; ni++) {
+      sum += (vector.data as number[])[ni] * (matrix.data as number[][])[mi][ni]
     }
     result.push(sum)
   }
 
-  return { shape: outputShape, data: result }
+  return { shape: [m], data: result }
 }

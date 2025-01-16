@@ -120,7 +120,7 @@ Deno.test('matVecMul', async (t) => {
     const right = { shape: [2, 2], data: [[3, 4], [5, 6]] }
     assertEquals(
       matVecMul(left, right),
-      { shape: [2], data: [13, 16] }, // 1*3 + 2*5 = 13, 1*4 + 2*6 = 16
+      { shape: [2], data: [11, 17] }
     )
   })
   await t.step('3-dimentional vector and 3x3 matrix', () => {
@@ -128,18 +128,18 @@ Deno.test('matVecMul', async (t) => {
     const right = { shape: [3, 3], data: [[1, 2, 3], [4, 5, 6], [7, 8, 9]] }
     assertEquals(
       matVecMul(left, right),
-      { shape: [3], data: [-6, -6, -6] }, // (1-7), (2-8), (3-9)
+      { shape: [3], data: [-2, -2, -2] },
     )
   })
   await t.step('Non-square case: 4-dimentional vector and 4x3 matrix', () => {
     const left = { shape: [4], data: [2, 3, 1, 0] }
     const right = {
-      shape: [4, 3],
-      data: [[1, 0, -1], [2, 1, 0], [0, 1, 1], [-1, 0, 2]],
+      shape: [3, 4],
+      data: [[1, 0, -1, 1], [2, 1, 0, 0], [1, 1, -1, 0]],
     }
     assertEquals(
       matVecMul(left, right),
-      { shape: [3], data: [8, 4, -1] }, // (2+6+0-0), (0+3+1+0), (-2+0+1+0)
+      { shape: [3], data: [1, 7, 4] }, // (2+6+0-0), (0+3+1+0), (-2+0+1+0)
     )
   })
 })

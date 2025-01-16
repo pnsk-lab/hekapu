@@ -131,10 +131,26 @@ export function grad(
           vector = left
         }
 
-        const gradA = matVecMul(getGradByNode(node.left), right)
+        const gradA: CPUTensor = {
+          data: [],
+          shape: matrix.shape
+        }
+        for (let i = 0; i < matrix.shape[0]; i++) {
+          (gradA.data as number[][]).push([...vector.data as number[]])
+        }
         setGradByNode(node.left, add(getGradByNode(node.left), gradA))
 
-        const gradX = matVecMul(left, getGradByNode(node.right))
+        const gradX: CPUTensor = {
+          data: [],
+          shape: matrix.shape
+        }
+        for (let n = 0; n < matrix.shape[1]; n++) {
+          let sum = 0
+          for (let m = 0; m < matrix.shape[0]; m++) {
+            sum += (matrix.data as number[][])[m][n]
+          }
+          ;(gradX.data as number[]).push(sum)
+        }
         setGradByNode(node.right, add(getGradByNode(node.right), gradX))
 
         backward(node.left)
