@@ -23,6 +23,12 @@ export interface MetoriAdapter {
   createTensorFromArray: (input: AnyShapeJSArrayOrNumber) => number | Promise<number>
 
   /**
+   * Destroy tensor
+   * @param id Tensor ID
+   */
+  destroyTensor: (id: number) => void | Promise<void>
+
+  /**
    * Calculate tensor
    * @param tree Calculating tree
    * @returns Calculated tensor

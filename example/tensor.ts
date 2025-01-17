@@ -6,4 +6,3 @@ const mt = useAdapter(createCPUAdapter())
 const tensor = mt.tensor([1, 2])
 
 const resolved = await tensor
-

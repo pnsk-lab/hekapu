@@ -143,6 +143,10 @@ export class CPUAdapter implements MetoriAdapter {
     )
   }
 
+  destroyTensor(id: number) {
+    this.#tensors.delete(id)
+  }
+
   calculateGradient(calculatingNode: CalculatingNode) {
     return grad(this, this.#tensors, calculatingNode)
   }
