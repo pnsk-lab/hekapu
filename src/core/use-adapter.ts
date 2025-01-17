@@ -1,5 +1,5 @@
 import type { MetoriAdapter } from '../adapter/shared.ts'
-import { type CreateTensor, useTensor } from './tensor.ts'
+import { type CreateTensor, useTensor } from './tensor/use-tensor.ts'
 import { type Backward, useBackward } from './use-backward.ts'
 import {
   type CreateOnes,

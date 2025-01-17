@@ -1,5 +1,4 @@
-import { MetoriAdapter } from './adapter/shared.ts'
-import type { ResolvedTensor, Tensor } from './core/tensor.ts'
+import type { MetoriAdapter } from './adapter/shared.ts'
 
 export type TensorShape = number[]
 

@@ -20,7 +20,7 @@ export interface MetoriAdapter {
    * @param input Input JS array
    * @returns Tensor ID
    */
-  createTensorFromArray: (input: AnyShapeJSArrayOrNumber) => number
+  createTensorFromArray: (input: AnyShapeJSArrayOrNumber) => number | Promise<number>
 
   /**
    * Calculate tensor

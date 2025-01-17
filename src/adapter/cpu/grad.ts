@@ -1,9 +1,9 @@
-import { ResolvedTensor } from '../../core/tensor.ts'
-import type { Tensor } from '../../mod.ts'
+import type { Tensor } from '../../core/tensor/types.ts'
 import type { CalculatingNode, TensorShape } from '../../types.ts'
 import type { MetoriAdapter } from '../shared.ts'
 import type { CPUAdapter, CPUTensor } from './mod.ts'
 import { add, dot, matVecMul, sub } from './operands.ts'
+import { ResolvedTensor } from '../../core/tensor/tensor.ts'
 
 // Reverse-mode automatic differentiation
 export function grad(
