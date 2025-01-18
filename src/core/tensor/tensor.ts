@@ -26,21 +26,66 @@ abstract class TensorBase<Shape extends TensorShape> {
 
   id = Symbol('Unique ID')
 
+  #createCalculatingTensorByNode (node: CalculatingNode, others: Tensor[]): CalculatingTensor<any> {
+    return new CalculatingTensor({
+      adapter: this.adapter,
+      node,
+      createPromises: createCreatePromises([this, ...others]),
+    })
+  }
+
   constructor(adapter: MetoriAdapter<any>) {
     this.adapter = adapter
   }
 
+  /**
+   * Adds 2 tensors.
+   */
   add(other: Tensor<Compatible<Shape>>): CalculatingTensor<Shape> {
-    const node: CalculatingNode = {
+    return this.#createCalculatingTensorByNode({
       type: 'add',
       left: this.node,
       right: other.node,
-    }
-    return new CalculatingTensor({
-      adapter: this.adapter,
-      node,
-      createPromises: createCreatePromises([this, other]),
-    })
+    }, [other])
+  }
+
+  sub(other: Tensor<Compatible<Shape>>): CalculatingTensor<Shape> {
+    return this.#createCalculatingTensorByNode({
+      type: 'sub',
+      left: this.node,
+      right: other.node
+    }, [other])
+  }
+
+  /**
+   * Calculates matrix and vector mul
+   * (m, n) * (n,) = (m,)
+   */
+  mv(vec: Shape extends [number, infer N] ? N extends number ? Tensor<[N]> : never : never): Shape extends [infer M, number] ? M extends number ? Tensor<[M]> : never : never
+  mv<O extends number>(matrix: Shape extends [infer M] ? M extends number ? Tensor<[O, M]> : never : never): Tensor<[O]>
+  mv(other: Tensor) {
+    return this.#createCalculatingTensorByNode({
+      type: 'matVecMul',
+      left: this.node,
+      right: other.node
+    }, [other])
+  }
+
+  /**
+   * (m, k) * (k, n) = (m, n)
+   */
+  // If this is (m, k)
+  // @ts-ignore For lightweight
+  matmul<N extends number, M extends number = Shape extends [infer M, number] ? M : never, K extends number = Shape extends [number, infer K] ? K : never>(other: Tensor<[K, N]>): Tensor<[M, N]>
+  // If this is (k, n)
+  // @ts-ignore For lightweight
+  matmul<M extends number, N extends number = Shape extends [number, infer N] ? N : never, K extends number = Shape extends [infer K, number] ? K : never>(other: Tensor<[M, K]>): Tensor<[M, N]>
+  matmul(other: Tensor): Tensor {
+    return this.#createCalculatingTensorByNode({
+      type: 'matmul',
+      left: this.node,
+      right: other.node
+    }, [other])
   }
 }
 

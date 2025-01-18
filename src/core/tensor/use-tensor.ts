@@ -1,10 +1,11 @@
 import type { MetoriAdapter } from '../../adapter/shared.ts'
-import type { AnyShapeJSArrayOrNumber } from '../../types.ts'
+import type { AnyShapeJSArrayOrNumber, GetShape } from '../../types.ts'
 import type { Tensor, TensorInitOptions } from './types.ts'
 import { CreatingTensor } from './tensor.ts'
 
 export interface CreateTensor {
-  (source: AnyShapeJSArrayOrNumber, opts?: TensorInitOptions): Tensor
+  // @ts-ignore pls how to fix
+  <Arr extends AnyShapeJSArrayOrNumber>(source: Arr, opts?: TensorInitOptions): Tensor<GetShape<Arr>>
 }
 
 export const useTensor = (adapter: MetoriAdapter<any>): CreateTensor => {
