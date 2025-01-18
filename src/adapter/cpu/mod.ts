@@ -1,6 +1,5 @@
 import type { MetoriAdapter, SupportedOperations } from '../shared.ts'
 import type {
-  AnyShapeJSArray,
   AnyShapeJSArrayOrNumber,
   CalculatingNode,
   TensorShape,
@@ -15,7 +14,11 @@ export type CPUTensor = {
   shape: TensorShape & { length: 0 }
   data: number
 }
-export class CPUAdapter implements MetoriAdapter {
+
+export interface CPUData {
+  tensor: CPUTensor
+}
+export class CPUAdapter implements MetoriAdapter<CPUData> {
   name = 'metori/cpu'
   supportedOperations: SupportedOperations = new Set([
     'add',
@@ -26,15 +29,6 @@ export class CPUAdapter implements MetoriAdapter {
     'matmul',
     'shape',
   ])
-
-  #tensors = new Map<number, CPUTensor>()
-  #id = 0
-
-  #createTensorFromCPUTensor(input: CPUTensor) {
-    this.#id++
-    this.#tensors.set(this.#id, input)
-    return this.#id
-  }
 
   createTensorFromArray(input: AnyShapeJSArrayOrNumber) {
     const shape: TensorShape = []
@@ -49,93 +43,103 @@ export class CPUAdapter implements MetoriAdapter {
         crr = next
       }
     }
-    return this.#createTensorFromCPUTensor({ shape, data: input })
+    return {
+      tensor: {
+        shape,
+        data: input,
+      },
+    }
   }
 
-  calculate(tree: CalculatingNode) {
+  calculate(tree: CalculatingNode<CPUData>): CPUData {
     switch (tree.type) {
       case 'tensor': {
-        return tree.id
+        if (!tree.data) {
+          throw new Error('Tensor data is not set')
+        }
+        return tree.data
       }
       case 'add': {
-        const leftId = this.calculate(tree.left)
-        const rightId = this.calculate(tree.right)
-        const leftTensor = this.#tensors.get(leftId)
-        const rightTensor = this.#tensors.get(rightId)
-        if (!leftTensor || !rightTensor) {
-          throw new Error('Tensor not found')
-        }
+        const leftTensor = this.calculate(tree.left).tensor
+        const rightTensor = this.calculate(tree.right).tensor
         add(leftTensor, rightTensor)
-        return this.createTensorFromArray(leftTensor.data)
+        return {
+          tensor: leftTensor
+        }
       }
       case 'sub': {
-        const leftId = this.calculate(tree.left)
-        const rightId = this.calculate(tree.right)
-        const leftTensor = this.#tensors.get(leftId)
-        const rightTensor = this.#tensors.get(rightId)
-        if (!leftTensor || !rightTensor) {
-          throw new Error('Tensor not found')
-        }
+        const leftTensor = this.calculate(tree.left).tensor
+        const rightTensor = this.calculate(tree.right).tensor
         sub(leftTensor, rightTensor)
-        return this.createTensorFromArray(leftTensor.data)
+        return {
+          tensor: leftTensor,
+        }
       }
       case 'zeros': {
-        const shape = tree.shape
-        const data = zeros(
-          Array.isArray(shape)
-            ? shape
-            : (this.toArray(this.calculate(shape)) as TensorShape),
-        )
-        return this.createTensorFromArray(data)
+        const shape = Array.isArray(tree.shape)
+          ? tree.shape
+          : (this.toArray(this.calculate(tree.shape)) as TensorShape)
+        const data = zeros(shape)
+        return {
+          tensor: {
+            shape,
+            data,
+          },
+        }
       }
       case 'ones': {
-        const shape = tree.shape
-        const data = ones(
-          Array.isArray(shape)
-            ? shape
-            : (this.toArray(this.calculate(shape)) as TensorShape),
-        )
-        return this.createTensorFromArray(data)
+        const shape = Array.isArray(tree.shape)
+          ? tree.shape
+          : (this.toArray(this.calculate(tree.shape)) as TensorShape)
+        const data = ones(shape)
+        return {
+          tensor: {
+            shape,
+            data,
+          },
+        }
       }
       case 'dot': {
-        const leftId = this.calculate(tree.left)
-        const rightId = this.calculate(tree.right)
-        const leftTensor = this.#tensors.get(leftId)
-        const rightTensor = this.#tensors.get(rightId)
+        const leftTensor = this.calculate(tree.left).tensor
+        const rightTensor = this.calculate(tree.right).tensor
         if (!leftTensor || !rightTensor) {
           throw new Error('Tensor not found')
         }
-        return this.createTensorFromArray(dot(leftTensor, rightTensor))
+        return {
+          tensor: {
+            shape: [1],
+            data: dot(leftTensor, rightTensor),
+          },
+        }
       }
       case 'matmul': {
-        const leftId = this.calculate(tree.left)
-        const rightId = this.calculate(tree.right)
-        const leftTensor = this.#tensors.get(leftId)
-        const rightTensor = this.#tensors.get(rightId)
+        const leftTensor = this.calculate(tree.left).tensor
+        const rightTensor = this.calculate(tree.right).tensor
         if (!leftTensor || !rightTensor) {
           throw new Error('Tensor not found')
         }
-        return this.#createTensorFromCPUTensor(matmul(leftTensor, rightTensor))
+        return {
+          tensor: matmul(leftTensor, rightTensor),
+        }
       }
       case 'matVecMul': {
-        const leftId = this.calculate(tree.left)
-        const rightId = this.calculate(tree.right)
-        const leftTensor = this.#tensors.get(leftId)
-        const rightTensor = this.#tensors.get(rightId)
+        const leftTensor = this.calculate(tree.left).tensor
+        const rightTensor = this.calculate(tree.right).tensor
         if (!leftTensor || !rightTensor) {
           throw new Error('Tensor not found')
         }
-        return this.#createTensorFromCPUTensor(
-          matVecMul(leftTensor, rightTensor),
-        )
+        return {
+          tensor: matVecMul(leftTensor, rightTensor),
+        }
       }
       case 'shape': {
-        const input = this.calculate(tree.input)
-        const inputTensor = this.#tensors.get(input)
-        if (!inputTensor) {
-          throw new Error('Tensor not found')
+        const input = this.calculate(tree.input).tensor
+        return {
+          tensor: {
+            shape: [input.shape.length],
+            data: input.shape
+          },
         }
-        return this.createTensorFromArray(inputTensor.shape)
       }
     }
     throw new TypeError(
@@ -143,16 +147,12 @@ export class CPUAdapter implements MetoriAdapter {
     )
   }
 
-  destroyTensor(id: number) {
-    this.#tensors.delete(id)
+  calculateGradient(calculatingNode: CalculatingNode<CPUData>) {
+    return grad(this, calculatingNode)
   }
 
-  calculateGradient(calculatingNode: CalculatingNode) {
-    return grad(this, this.#tensors, calculatingNode)
-  }
-
-  toArray(id: number) {
-    const tensor = this.#tensors.get(id)
+  toArray(data: CPUData) {
+    const tensor = data.tensor
     if (!tensor) {
       throw new Error('Tensor not found')
     }
@@ -160,6 +160,6 @@ export class CPUAdapter implements MetoriAdapter {
   }
 }
 
-export default function createCPUAdapter(): MetoriAdapter {
+export default function createCPUAdapter(): MetoriAdapter<CPUData> {
   return new CPUAdapter()
 }

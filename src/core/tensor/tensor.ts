@@ -22,9 +22,9 @@ abstract class TensorBase<Shape extends TensorShape> {
 
   abstract node: CalculatingNode
 
-  readonly adapter: MetoriAdapter
+  readonly adapter: MetoriAdapter<any>
 
-  constructor(adapter: MetoriAdapter) {
+  constructor(adapter: MetoriAdapter<any>) {
     this.adapter = adapter
   }
 
@@ -43,28 +43,32 @@ abstract class TensorBase<Shape extends TensorShape> {
 }
 
 export interface ResolvedTensorInit {
-  id: number
-  adapter: MetoriAdapter
+  data: any
+  adapter: MetoriAdapter<any>
 }
 export class ResolvedTensor<Shape extends TensorShape> extends TensorBase<Shape> {
   isResolved: true = true
   isCreating: false = false
   isCalculating: false = false
 
-  node: CalculatingNode
+  node: CalculatingNode<unknown> & { type: 'tensor' }
 
   constructor(init: ResolvedTensorInit) {
     super(init.adapter)
     this.node = {
       type: 'tensor',
-      id: init.id,
+      data: init.data,
     }
+  }
+
+  toArray() {
+    return this.adapter.toArray(this.node.data)
   }
 }
 
 export interface CreatingTensorInit {
-  adapter: MetoriAdapter
-  id: number | Promise<number>
+  adapter: MetoriAdapter<any>
+  data: any | Promise<any>
 }
 
 /**
@@ -83,19 +87,19 @@ export class CreatingTensor<Shape extends TensorShape> extends TensorBase<Shape>
   constructor(init: CreatingTensorInit) {
     super(init.adapter)
     this.#init = init
-    if (typeof init.id === 'number') {
+    if (init.data instanceof Promise) {
+      this.node = {
+        type: 'tensor',
+        data: undefined,
+      }
+    } else {
       this.#resolved = new ResolvedTensor({
-        id: init.id,
+        data: init.data,
         adapter: init.adapter,
       })
       this.node = {
         type: 'tensor',
-        id: init.id,
-      }
-    } else {
-      this.node = {
-        type: 'tensor',
-        id: Number.NaN, // The id will be set when the tensor was resolved.
+        data: init.data,
       }
     }
   }
@@ -112,13 +116,13 @@ export class CreatingTensor<Shape extends TensorShape> extends TensorBase<Shape>
       return this.#resolved
     }
 
-    const id = await this.#init.id
+    const data = await this.#init.data
     this.#resolved = new ResolvedTensor({
-      id,
+      data,
       adapter: this.#init.adapter,
     })
 
-    this.node.id = id
+    this.node.data = data
 
     return this.#resolved
   }
@@ -126,12 +130,16 @@ export class CreatingTensor<Shape extends TensorShape> extends TensorBase<Shape>
   then(onfulfilled: (value: ResolvedTensor<Shape>) => void, onrejected?: (reason?: unknown) => void) {
     return this.resolve().then(onfulfilled, onrejected)
   }
+
+  toArray() {
+    return this.resolve().then(tensor => tensor.toArray())
+  }
 }
 
 
 export interface CalculatingTensorInit {
   node: CalculatingNode
-  adapter: MetoriAdapter
+  adapter: MetoriAdapter<any>
   createPromises: Promise<unknown>[]
 }
 
@@ -146,7 +154,7 @@ export class CalculatingTensor<Shape extends TensorShape> extends TensorBase<Sha
   #init: CalculatingTensorInit
   #resolved?: ResolvedTensor<Shape>
 
-  node: CalculatingNode
+  node: CalculatingNode<unknown>
 
   constructor(init: CalculatingTensorInit) {
     super(init.adapter)
@@ -174,10 +182,10 @@ export class CalculatingTensor<Shape extends TensorShape> extends TensorBase<Sha
       return this.#resolved
     }
 
-    const id = await this.#init.adapter.calculate(this.#init.node)
+    const data = await this.#init.adapter.calculate(this.#init.node as CalculatingNode<unknown>)
 
     this.#resolved = new ResolvedTensor({
-      id,
+      data,
       adapter: this.#init.adapter,
     })
 
@@ -186,5 +194,9 @@ export class CalculatingTensor<Shape extends TensorShape> extends TensorBase<Sha
 
   then(onfulfilled: (value: ResolvedTensor<Shape>) => void, onrejected?: (reason?: unknown) => void) {
     return this.resolve().then(onfulfilled, onrejected)
+  }
+
+  toArray() {
+    return this.resolve().then(tensor => tensor.toArray())
   }
 }

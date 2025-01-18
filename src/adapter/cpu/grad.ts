@@ -1,34 +1,33 @@
 import type { Tensor } from '../../core/tensor/types.ts'
 import type { CalculatingNode, TensorShape } from '../../types.ts'
-import type { MetoriAdapter } from '../shared.ts'
-import type { CPUAdapter, CPUTensor } from './mod.ts'
+import type { GradResult, MetoriAdapter } from '../shared.ts'
+import type { CPUAdapter, CPUTensor, CPUData } from './mod.ts'
 import { add, dot, matVecMul, sub } from './operands.ts'
 import { ResolvedTensor } from '../../core/tensor/tensor.ts'
 
 // Reverse-mode automatic differentiation
 export function grad(
   adapter: CPUAdapter,
-  tensors: Map<number, CPUTensor>,
-  y: CalculatingNode,
-): Record<number, Tensor<TensorShape>> {
+  y: CalculatingNode<CPUData>,
+): GradResult<CPUData> {
   // First, forward it.
-  const forwardedTensors = new Map<CalculatingNode | number, CPUTensor>()
-  const getForwardedTensor = (node: CalculatingNode): CPUTensor => {
-    const tensor = forwardedTensors.get(node.type === 'tensor' ? node.id : node)
+  const forwardedTensors = new Map<CalculatingNode<CPUData>, CPUTensor>()
+  const getForwardedTensor = (node: CalculatingNode<CPUData>): CPUTensor => {
+    const tensor = forwardedTensors.get(node)
     if (!tensor) {
       throw new Error(`Forwarded tensor for ${node} not found.`)
     }
     return tensor
   }
-  const forward = (node: CalculatingNode): CPUTensor => {
+  const forward = (node: CalculatingNode<CPUData>): CPUTensor => {
     switch (node.type) {
       case 'tensor': {
-        const tensor = tensors.get(node.id)
+        const tensor = node.data
         if (!tensor) {
-          throw new Error(`Tensor ${node.id} not found.`)
+          throw new Error(`Tensor data was not set.`)
         }
-        forwardedTensors.set(node.id, tensor)
-        return tensor
+        forwardedTensors.set(node, tensor.tensor)
+        return tensor.tensor
       }
       case 'add': {
         const left = forward(node.left)
@@ -74,26 +73,24 @@ export function grad(
   // if the node is a tensor, a key will be a number.
   // in the other case, a key will be the add node.
 
-  const grads = new Map<CalculatingNode | number, CPUTensor>()
-  const getGradByNode = (node: CalculatingNode): CPUTensor => {
-    const key = node.type === 'tensor' ? node.id : node
-    const forwarded = forwardedTensors.get(key)
+  const grads = new Map<CalculatingNode<CPUData>, CPUTensor>()
+  const getGradByNode = (node: CalculatingNode<CPUData>): CPUTensor => {
+    const forwarded = forwardedTensors.get(node)
     if (!forwarded) {
       throw new Error(`Forwarded tensor for not found.`)
     }
-    return grads.get(node.type === 'tensor' ? node.id : node) ?? {
+    return grads.get(node) ?? {
       shape: forwarded.shape,
       data: adapter.toArray(
         adapter.calculate({ type: 'zeros', shape: forwarded.shape }),
       ),
     }
   }
-  const setGradByNode = (node: CalculatingNode, grad: CPUTensor) => {
-    const key = node.type === 'tensor' ? node.id : node
-    grads.set(key, grad)
+  const setGradByNode = (node: CalculatingNode<CPUData>, grad: CPUTensor) => {
+    grads.set(node, grad)
   }
 
-  const backward = (node: CalculatingNode) => {
+  const backward = (node: CalculatingNode<CPUData>) => {
     switch (node.type) {
       case 'tensor': {
         break
@@ -178,16 +175,16 @@ export function grad(
   }
   backward(y)
 
-  return Object.fromEntries(
+  return new Map(
     [...grads]
-      .filter(([key]) => typeof key === 'number')
+      .filter(([key]) => key.type === 'tensor')
       .map((
         [k, v],
-      ) => [
-        k,
-        new ResolvedTensor(adapter.createTensorFromArray(v.data), {
-          adapter: adapter as MetoriAdapter,
-        }),
+      ): [CPUData, CPUData] => [
+        (k as (CalculatingNode<CPUData> & { type: 'tensor' })).data!,
+        {
+          tensor: v,
+        }
       ]),
   )
 }

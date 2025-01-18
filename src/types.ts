@@ -19,40 +19,41 @@ export type Compatible<T extends any[]> =
     : [])
   | []
 
-export type CalculatingNode = {
+export type CalculatingNode<T = unknown> = {
   type: 'tensor'
-  id: number
+
+  data?: T
 
   requiresGrad?: boolean
 } | {
   type: 'add'
-  left: CalculatingNode
-  right: CalculatingNode
+  left: CalculatingNode<T>
+  right: CalculatingNode<T>
 } | {
   type: 'sub'
-  left: CalculatingNode
-  right: CalculatingNode
+  left: CalculatingNode<T>
+  right: CalculatingNode<T>
 } | {
   type: 'zeros'
-  shape: TensorShape | CalculatingNode
+  shape: TensorShape | CalculatingNode<T>
 } | {
   type: 'ones'
-  shape: TensorShape | CalculatingNode
+  shape: TensorShape | CalculatingNode<T>
 } | {
   type: 'dot'
-  left: CalculatingNode
-  right: CalculatingNode
+  left: CalculatingNode<T>
+  right: CalculatingNode<T>
 } | {
   type: 'matmul'
-  left: CalculatingNode
-  right: CalculatingNode
+  left: CalculatingNode<T>
+  right: CalculatingNode<T>
 } | {
   type: 'matVecMul'
-  left: CalculatingNode
-  right: CalculatingNode
+  left: CalculatingNode<T>
+  right: CalculatingNode<T>
 } | {
   type: 'shape'
-  input: CalculatingNode
+  input: CalculatingNode<T>
 }
 
 export interface TensorOptions {

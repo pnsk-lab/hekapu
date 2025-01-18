@@ -6,19 +6,13 @@ export interface CreateTensor {
   (source: AnyShapeJSArrayOrNumber): Tensor
 }
 
-export const useTensor = (adapter: MetoriAdapter): CreateTensor => {
+export const useTensor = (adapter: MetoriAdapter<any>): CreateTensor => {
   return (source) => {
-    const id = adapter.createTensorFromArray(source)
+    const data = adapter.createTensorFromArray(source)
     const tensor = new CreatingTensor({
-      id,
       adapter,
+      data,
     })
-
-    const finalizer = async (id: number | Promise<number>) => {
-      await adapter.destroyTensor(await id)
-    }
-    const finalizationRegistry = new FinalizationRegistry(finalizer)
-    finalizationRegistry.register(tensor, id)
     return tensor
   }
 }
