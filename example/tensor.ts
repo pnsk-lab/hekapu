@@ -3,6 +3,11 @@ import createCPUAdapter from '@pnsk-lab/metori/adapter/cpu'
 
 const mt = useAdapter(createCPUAdapter())
 
-const tensor = mt.tensor([1, 2]).add(mt.tensor([3, 4]))
+const x = mt.tensor([0, 1, 2], { requiresGrad: true })
+const y = mt.tensor([1, 2, 3])
 
-console.log(await tensor.toArray())
+const f = x.add(y)
+
+const backwarded = await mt.backward(f)
+
+console.log(await backwarded.refer(x).toArray())

@@ -11,9 +11,9 @@ export function grad(
   y: CalculatingNode<CPUData>,
 ): GradResult<CPUData> {
   // First, forward it.
-  const forwardedTensors = new Map<CalculatingNode<CPUData> | CPUData, CPUTensor>()
+  const forwardedTensors = new Map<CalculatingNode<CPUData> | symbol, CPUTensor>()
   const getForwardedTensor = (node: CalculatingNode<CPUData>): CPUTensor => {
-    const key = node.type === 'tensor' ? node.data! : node
+    const key = node.type === 'tensor' ? node.id : node
     const tensor = forwardedTensors.get(key)
     if (!tensor) {
       throw new Error(`Forwarded tensor for ${node} not found.`)
@@ -28,7 +28,7 @@ export function grad(
           throw new Error(`Tensor data was not set.`)
         }
 
-        forwardedTensors.set(tensor, tensor.tensor)
+        forwardedTensors.set(node.id, tensor.tensor)
         return tensor.tensor
       }
       case 'add': {
@@ -75,9 +75,9 @@ export function grad(
   // if the node is a tensor, a key will be a number.
   // in the other case, a key will be the add node.
 
-  const grads = new Map<CalculatingNode<CPUData> | CPUData, CPUTensor>()
+  const grads = new Map<CalculatingNode<CPUData> | symbol, CPUTensor>()
   const getGradByNode = (node: CalculatingNode<CPUData>): CPUTensor => {
-    const key = node.type === 'tensor' ? node.data! : node
+    const key = node.type === 'tensor' ? node.id : node
     
     const forwarded = forwardedTensors.get(key)
     if (!forwarded) {
@@ -91,7 +91,7 @@ export function grad(
     }
   }
   const setGradByNode = (node: CalculatingNode<CPUData>, grad: CPUTensor) => {
-    const key = node.type === 'tensor' ? node.data! : node
+    const key = node.type === 'tensor' ? node.id : node
 
     grads.set(key, grad)
   }
@@ -183,11 +183,11 @@ export function grad(
 
   return new Map(
     [...grads]
-      .filter(([key]) => 'tensor' in key)
+      .filter(([key]) => typeof key === 'symbol')
       .map((
         [k, v],
-      ): [CPUData, CPUData] => [
-        (k as CPUData),
+      ): [symbol, CPUData] => [
+        (k as symbol),
         {
           tensor: v,
         }

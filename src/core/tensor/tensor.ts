@@ -24,6 +24,8 @@ abstract class TensorBase<Shape extends TensorShape> {
 
   readonly adapter: MetoriAdapter<any>
 
+  id = Symbol('Unique ID')
+
   constructor(adapter: MetoriAdapter<any>) {
     this.adapter = adapter
   }
@@ -58,6 +60,7 @@ export class ResolvedTensor<Shape extends TensorShape> extends TensorBase<Shape>
     this.node = {
       type: 'tensor',
       data: init.data,
+      id: this.id
     }
   }
 
@@ -69,6 +72,7 @@ export class ResolvedTensor<Shape extends TensorShape> extends TensorBase<Shape>
 export interface CreatingTensorInit {
   adapter: MetoriAdapter<any>
   data: any | Promise<any>
+  requiresGrad: boolean
 }
 
 /**
@@ -91,6 +95,8 @@ export class CreatingTensor<Shape extends TensorShape> extends TensorBase<Shape>
       this.node = {
         type: 'tensor',
         data: undefined,
+        requiresGrad: init.requiresGrad,
+        id: this.id
       }
     } else {
       this.#resolved = new ResolvedTensor({
@@ -100,6 +106,8 @@ export class CreatingTensor<Shape extends TensorShape> extends TensorBase<Shape>
       this.node = {
         type: 'tensor',
         data: init.data,
+        requiresGrad: init.requiresGrad,
+        id: this.id
       }
     }
   }

@@ -23,6 +23,7 @@ export type CalculatingNode<T = unknown> = {
   type: 'tensor'
 
   data?: T
+  id: symbol
 
   requiresGrad?: boolean
 } | {
@@ -56,15 +57,7 @@ export type CalculatingNode<T = unknown> = {
   input: CalculatingNode<T>
 }
 
-export interface TensorOptions {
-  /**
-   * Whether to automatically calculate gradients
-   * @default false
-   */
-  requiresGrad?: boolean
-}
-
 export interface TensorInternalOptions {
-  adapter: MetoriAdapter
+  adapter: MetoriAdapter<any>
   calculatingHistory?: CalculatingNode
 }

@@ -7,7 +7,7 @@ import type {
 
 export type SupportedOperations = Set<CalculatingNode['type']>
 
-export type GradResult<T> = Map<T, T>
+export type GradResult<T> = Map<symbol, T>
 
 export interface MetoriAdapter<T> {
   name: string
