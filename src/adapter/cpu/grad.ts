@@ -11,9 +11,10 @@ export function grad(
   y: CalculatingNode<CPUData>,
 ): GradResult<CPUData> {
   // First, forward it.
-  const forwardedTensors = new Map<CalculatingNode<CPUData>, CPUTensor>()
+  const forwardedTensors = new Map<CalculatingNode<CPUData> | CPUData, CPUTensor>()
   const getForwardedTensor = (node: CalculatingNode<CPUData>): CPUTensor => {
-    const tensor = forwardedTensors.get(node)
+    const key = node.type === 'tensor' ? node.data! : node
+    const tensor = forwardedTensors.get(key)
     if (!tensor) {
       throw new Error(`Forwarded tensor for ${node} not found.`)
     }
@@ -26,7 +27,8 @@ export function grad(
         if (!tensor) {
           throw new Error(`Tensor data was not set.`)
         }
-        forwardedTensors.set(node, tensor.tensor)
+
+        forwardedTensors.set(tensor, tensor.tensor)
         return tensor.tensor
       }
       case 'add': {
@@ -73,13 +75,15 @@ export function grad(
   // if the node is a tensor, a key will be a number.
   // in the other case, a key will be the add node.
 
-  const grads = new Map<CalculatingNode<CPUData>, CPUTensor>()
+  const grads = new Map<CalculatingNode<CPUData> | CPUData, CPUTensor>()
   const getGradByNode = (node: CalculatingNode<CPUData>): CPUTensor => {
-    const forwarded = forwardedTensors.get(node)
+    const key = node.type === 'tensor' ? node.data! : node
+    
+    const forwarded = forwardedTensors.get(key)
     if (!forwarded) {
       throw new Error(`Forwarded tensor for not found.`)
     }
-    return grads.get(node) ?? {
+    return grads.get(key) ?? {
       shape: forwarded.shape,
       data: adapter.toArray(
         adapter.calculate({ type: 'zeros', shape: forwarded.shape }),
@@ -87,7 +91,9 @@ export function grad(
     }
   }
   const setGradByNode = (node: CalculatingNode<CPUData>, grad: CPUTensor) => {
-    grads.set(node, grad)
+    const key = node.type === 'tensor' ? node.data! : node
+
+    grads.set(key, grad)
   }
 
   const backward = (node: CalculatingNode<CPUData>) => {
@@ -177,11 +183,11 @@ export function grad(
 
   return new Map(
     [...grads]
-      .filter(([key]) => key.type === 'tensor')
+      .filter(([key]) => 'tensor' in key)
       .map((
         [k, v],
       ): [CPUData, CPUData] => [
-        (k as (CalculatingNode<CPUData> & { type: 'tensor' })).data!,
+        (k as CPUData),
         {
           tensor: v,
         }
