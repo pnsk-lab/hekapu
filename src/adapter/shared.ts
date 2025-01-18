@@ -1,13 +1,15 @@
 import type { Tensor } from '../mod.ts'
 import type {
-  AnyShapeJSArray,
   AnyShapeJSArrayOrNumber,
   CalculatingNode,
   TensorShape,
 } from '../types.ts'
 
 export type SupportedOperations = Set<CalculatingNode['type']>
-export interface MetoriAdapter {
+
+export type GradResult<T> = Map<symbol, T>
+
+export interface MetoriAdapter<T> {
   name: string
 
   /**
@@ -20,32 +22,26 @@ export interface MetoriAdapter {
    * @param input Input JS array
    * @returns Tensor ID
    */
-  createTensorFromArray: (input: AnyShapeJSArrayOrNumber) => number
+  createTensorFromArray: (input: AnyShapeJSArrayOrNumber) => T | Promise<T>
 
   /**
    * Calculate tensor
    * @param tree Calculating tree
    * @returns Calculated tensor
    */
-  calculate: (tree: CalculatingNode) => Promise<number> | number
+  calculate: (tree: CalculatingNode<T>) => Promise<T> | T
 
   /**
    * Calculate gradient
    * @param tree Calculating tree
    * @returns Gradient
    */
-  calculateGradient: (
-    tree: CalculatingNode,
-  ) =>
-    | Promise<Record<number, Tensor<TensorShape>>>
-    | Record<number, Tensor<TensorShape>>
+  calculateGradient: (tree: CalculatingNode<T>) => Promise<GradResult<T>> | GradResult<T>
 
   /**
    * Convert tensor to array
    * @param id Tensor ID
    * @returns Array
    */
-  toArray: (
-    id: number,
-  ) => Promise<AnyShapeJSArrayOrNumber> | AnyShapeJSArrayOrNumber
+  toArray: (data: T) => Promise<AnyShapeJSArrayOrNumber> | AnyShapeJSArrayOrNumber
 }

@@ -1,5 +1,4 @@
-import { MetoriAdapter } from './adapter/shared.ts'
-import type { ResolvedTensor, Tensor } from './core/tensor.ts'
+import type { MetoriAdapter } from './adapter/shared.ts'
 
 export type TensorShape = number[]
 
@@ -20,51 +19,45 @@ export type Compatible<T extends any[]> =
     : [])
   | []
 
-export type CalculatingNode = {
+export type CalculatingNode<T = unknown> = {
   type: 'tensor'
-  id: number
+
+  data?: T
+  id: symbol
 
   requiresGrad?: boolean
 } | {
   type: 'add'
-  left: CalculatingNode
-  right: CalculatingNode
+  left: CalculatingNode<T>
+  right: CalculatingNode<T>
 } | {
   type: 'sub'
-  left: CalculatingNode
-  right: CalculatingNode
+  left: CalculatingNode<T>
+  right: CalculatingNode<T>
 } | {
   type: 'zeros'
-  shape: TensorShape | CalculatingNode
+  shape: TensorShape | CalculatingNode<T>
 } | {
   type: 'ones'
-  shape: TensorShape | CalculatingNode
+  shape: TensorShape | CalculatingNode<T>
 } | {
   type: 'dot'
-  left: CalculatingNode
-  right: CalculatingNode
+  left: CalculatingNode<T>
+  right: CalculatingNode<T>
 } | {
   type: 'matmul'
-  left: CalculatingNode
-  right: CalculatingNode
+  left: CalculatingNode<T>
+  right: CalculatingNode<T>
 } | {
   type: 'matVecMul'
-  left: CalculatingNode
-  right: CalculatingNode
+  left: CalculatingNode<T>
+  right: CalculatingNode<T>
 } | {
   type: 'shape'
-  input: CalculatingNode
-}
-
-export interface TensorOptions {
-  /**
-   * Whether to automatically calculate gradients
-   * @default false
-   */
-  requiresGrad?: boolean
+  input: CalculatingNode<T>
 }
 
 export interface TensorInternalOptions {
-  adapter: MetoriAdapter
+  adapter: MetoriAdapter<any>
   calculatingHistory?: CalculatingNode
 }

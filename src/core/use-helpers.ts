@@ -1,5 +1,5 @@
 import type { TensorShape } from '../types.ts'
-import { CalculatingTensor } from './mod.ts'
+import { CalculatingTensor } from '../core/tensor/tensor.ts'
 import type { MetoriAdapter } from '../adapter/shared.ts'
 
 export interface CreateZeros {
@@ -8,11 +8,12 @@ export interface CreateZeros {
 export const useZeros = (adapter: MetoriAdapter): CreateZeros => {
   return (shape) => {
     return new CalculatingTensor({
-      type: 'zeros',
-      shape,
-    }, {
+      node: {
+        type: 'zeros',
+        shape,
+      },
       adapter,
-      calculatingHistory: undefined,
+      createPromises: [],
     })
   }
 }
@@ -23,11 +24,12 @@ export interface CreateOnes {
 export const useOnes = (adapter: MetoriAdapter): CreateOnes => {
   return (shape) => {
     return new CalculatingTensor({
-      type: 'ones',
-      shape,
-    }, {
+      node: {
+        type: 'ones',
+        shape,
+      },
       adapter,
-      calculatingHistory: undefined,
+      createPromises: [],
     })
   }
 }
