@@ -35,7 +35,7 @@ export interface UsedAdapter {
  * mt.zeros([2, 2]) // Create Tensor with zeros, shape: [2, 2]
  * ```
  */
-export const useAdapter = (adapter: HekapuAdapter): UsedAdapter => {
+export const useAdapter = (adapter: HekapuAdapter<any>): UsedAdapter => {
   return {
     tensor: useTensor(adapter),
     backward: useBackward(adapter),
