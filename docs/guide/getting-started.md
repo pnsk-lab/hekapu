@@ -5,6 +5,7 @@ Hekapu is a TypeScript library for building ML projects.
 You can install via JSR.
 
 Here is a simple example:
+
 ```ts
 import { useAdapter } from '@pnsk-lab/hekapu'
 import createCPUAdapter from '@pnsk-lab/hekapu/adapter/cpu'

@@ -3,11 +3,16 @@ import type { CalculatingNode, Compatible } from '../../types.ts'
 import type { TensorShape } from '../../types.ts'
 import type { Tensor } from './types.ts'
 
-const createCreatePromises = (tensors: (Tensor | TensorBase<TensorShape>)[]) => {
+const createCreatePromises = (
+  tensors: (Tensor | TensorBase<TensorShape>)[],
+) => {
   const createPromises: Promise<unknown>[] = []
   for (const tensor of tensors) {
     if (tensor.isCalculating || tensor.isCreating) {
-      const promise = (tensor as (CalculatingTensor<TensorShape> | CreatingTensor<TensorShape>)).create()
+      const promise = (tensor as (
+        | CalculatingTensor<TensorShape>
+        | CreatingTensor<TensorShape>
+      )).create()
       if (promise) {
         createPromises.push(promise)
       }
@@ -26,7 +31,10 @@ abstract class TensorBase<Shape extends TensorShape> {
 
   id = Symbol('Unique ID')
 
-  #createCalculatingTensorByNode (node: CalculatingNode, others: Tensor[]): CalculatingTensor<any> {
+  #createCalculatingTensorByNode(
+    node: CalculatingNode,
+    others: Tensor[],
+  ): CalculatingTensor<any> {
     return new CalculatingTensor({
       adapter: this.adapter,
       node,
@@ -53,7 +61,7 @@ abstract class TensorBase<Shape extends TensorShape> {
     return this.#createCalculatingTensorByNode({
       type: 'sub',
       left: this.node,
-      right: other.node
+      right: other.node,
     }, [other])
   }
 
@@ -61,13 +69,21 @@ abstract class TensorBase<Shape extends TensorShape> {
    * Calculates matrix and vector mul
    * (m, n) * (n,) = (m,)
    */
-  mv(vec: Shape extends [number, infer N] ? N extends number ? Tensor<[N]> : never : never): Shape extends [infer M, number] ? M extends number ? Tensor<[M]> : never : never
-  mv<O extends number>(matrix: Shape extends [infer M] ? M extends number ? Tensor<[O, M]> : never : never): Tensor<[O]>
+  mv(
+    vec: Shape extends [number, infer N]
+      ? N extends number ? Tensor<[N]> : never
+      : never,
+  ): Shape extends [infer M, number] ? M extends number ? Tensor<[M]> : never
+    : never
+  mv<O extends number>(
+    matrix: Shape extends [infer M] ? M extends number ? Tensor<[O, M]> : never
+      : never,
+  ): Tensor<[O]>
   mv(other: Tensor) {
     return this.#createCalculatingTensorByNode({
       type: 'matVecMul',
       left: this.node,
-      right: other.node
+      right: other.node,
     }, [other])
   }
 
@@ -76,15 +92,23 @@ abstract class TensorBase<Shape extends TensorShape> {
    */
   // If this is (m, k)
   // @ts-ignore For lightweight
-  matmul<N extends number, M extends number = Shape extends [infer M, number] ? M : never, K extends number = Shape extends [number, infer K] ? K : never>(other: Tensor<[K, N]>): Tensor<[M, N]>
+  matmul<
+    N extends number,
+    M extends number = Shape extends [infer M, number] ? M : never,
+    K extends number = Shape extends [number, infer K] ? K : never,
+  >(other: Tensor<[K, N]>): Tensor<[M, N]>
   // If this is (k, n)
   // @ts-ignore For lightweight
-  matmul<M extends number, N extends number = Shape extends [number, infer N] ? N : never, K extends number = Shape extends [infer K, number] ? K : never>(other: Tensor<[M, K]>): Tensor<[M, N]>
+  matmul<
+    M extends number,
+    N extends number = Shape extends [number, infer N] ? N : never,
+    K extends number = Shape extends [infer K, number] ? K : never,
+  >(other: Tensor<[M, K]>): Tensor<[M, N]>
   matmul(other: Tensor): Tensor {
     return this.#createCalculatingTensorByNode({
       type: 'matmul',
       left: this.node,
-      right: other.node
+      right: other.node,
     }, [other])
   }
 }
@@ -93,7 +117,8 @@ export interface ResolvedTensorInit {
   data: any
   adapter: HekapuAdapter<any>
 }
-export class ResolvedTensor<Shape extends TensorShape> extends TensorBase<Shape> {
+export class ResolvedTensor<Shape extends TensorShape>
+  extends TensorBase<Shape> {
   isResolved: true = true
   isCreating: false = false
   isCalculating: false = false
@@ -105,7 +130,7 @@ export class ResolvedTensor<Shape extends TensorShape> extends TensorBase<Shape>
     this.node = {
       type: 'tensor',
       data: init.data,
-      id: this.id
+      id: this.id,
     }
   }
 
@@ -123,7 +148,8 @@ export interface CreatingTensorInit {
 /**
  * Tensor in a state where it has not been checked whether the tensor has been created or not.
  */
-export class CreatingTensor<Shape extends TensorShape> extends TensorBase<Shape> {
+export class CreatingTensor<Shape extends TensorShape>
+  extends TensorBase<Shape> {
   isResolved: false = false
   isCreating: true = true
   isCalculating: false = false
@@ -141,7 +167,7 @@ export class CreatingTensor<Shape extends TensorShape> extends TensorBase<Shape>
         type: 'tensor',
         data: undefined,
         requiresGrad: init.requiresGrad,
-        id: this.id
+        id: this.id,
       }
     } else {
       this.#resolved = new ResolvedTensor({
@@ -152,7 +178,7 @@ export class CreatingTensor<Shape extends TensorShape> extends TensorBase<Shape>
         type: 'tensor',
         data: init.data,
         requiresGrad: init.requiresGrad,
-        id: this.id
+        id: this.id,
       }
     }
   }
@@ -180,15 +206,17 @@ export class CreatingTensor<Shape extends TensorShape> extends TensorBase<Shape>
     return this.#resolved
   }
 
-  then(onfulfilled: (value: ResolvedTensor<Shape>) => void, onrejected?: (reason?: unknown) => void) {
+  then(
+    onfulfilled: (value: ResolvedTensor<Shape>) => void,
+    onrejected?: (reason?: unknown) => void,
+  ) {
     return this.resolve().then(onfulfilled, onrejected)
   }
 
   toArray() {
-    return this.resolve().then(tensor => tensor.toArray())
+    return this.resolve().then((tensor) => tensor.toArray())
   }
 }
-
 
 export interface CalculatingTensorInit {
   node: CalculatingNode
@@ -199,7 +227,8 @@ export interface CalculatingTensorInit {
 /**
  * Tensor with results not yet computed.
  */
-export class CalculatingTensor<Shape extends TensorShape> extends TensorBase<Shape> {
+export class CalculatingTensor<Shape extends TensorShape>
+  extends TensorBase<Shape> {
   isResolved: false = false
   isCreating: false = false
   isCalculating: true = true
@@ -235,7 +264,9 @@ export class CalculatingTensor<Shape extends TensorShape> extends TensorBase<Sha
       return this.#resolved
     }
 
-    const data = await this.#init.adapter.calculate(this.#init.node as CalculatingNode<unknown>)
+    const data = await this.#init.adapter.calculate(
+      this.#init.node as CalculatingNode<unknown>,
+    )
 
     this.#resolved = new ResolvedTensor({
       data,
@@ -245,11 +276,14 @@ export class CalculatingTensor<Shape extends TensorShape> extends TensorBase<Sha
     return this.#resolved
   }
 
-  then(onfulfilled: (value: ResolvedTensor<Shape>) => void, onrejected?: (reason?: unknown) => void) {
+  then(
+    onfulfilled: (value: ResolvedTensor<Shape>) => void,
+    onrejected?: (reason?: unknown) => void,
+  ) {
     return this.resolve().then(onfulfilled, onrejected)
   }
 
   toArray() {
-    return this.resolve().then(tensor => tensor.toArray())
+    return this.resolve().then((tensor) => tensor.toArray())
   }
 }

@@ -5,7 +5,10 @@ import { CreatingTensor } from './tensor.ts'
 
 export interface CreateTensor {
   // @ts-ignore pls how to fix
-  <Arr extends AnyShapeJSArrayOrNumber>(source: Arr, opts?: TensorInitOptions): Tensor<GetShape<Arr>>
+  <Arr extends AnyShapeJSArrayOrNumber>(
+    source: Arr,
+    opts?: TensorInitOptions,
+  ): Tensor<GetShape<Arr>>
 }
 
 export const useTensor = (adapter: HekapuAdapter<any>): CreateTensor => {
@@ -14,7 +17,7 @@ export const useTensor = (adapter: HekapuAdapter<any>): CreateTensor => {
     const tensor = new CreatingTensor({
       adapter,
       data,
-      requiresGrad: !!opts.requiresGrad
+      requiresGrad: !!opts.requiresGrad,
     })
     return tensor
   }
