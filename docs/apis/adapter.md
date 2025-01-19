@@ -13,13 +13,13 @@ adapter.
 
 ## Usage
 
-```ts
-import { useAdapter } from '@pnsk-lab/hekapu'
-import createCPUAdapter from '@pnsk-lab/hekapu/adapter/cpu'
+```ts twoslash
+import { useAdapter } from 'hekapu'
+import createCPUAdapter from 'hekapu/adapter/cpu'
 
-const mt = useAdapter(createCPUAdapter())
+const hk = useAdapter(createCPUAdapter())
 
-const scalar = mt.tensor(0)
+const scalar = hk.tensor(0)
 ```
 
 Import adapter and useAdapter to use Hekapu.
