@@ -8,7 +8,9 @@ array are supported.
 To create a tensor from a JS number or array, use `mt.tensor()` API.
 
 ```ts twoslash
-import { useAdapter } from 'hekapu';import createCPUAdapter from 'hekapu/adapter/cpu';const hk = useAdapter(createCPUAdapter())
+import { useAdapter } from 'hekapu'
+import createCPUAdapter from 'hekapu/adapter/cpu'
+const hk = useAdapter(createCPUAdapter())
 // ---cut---
 const scalar = hk.tensor(0)
 const vector = hk.tensor([1, 2, 3])
@@ -21,7 +23,9 @@ const matrix = hk.tensor([
 To get a JS value, use `tensor.toArray()` method. It's async process.
 
 ```ts twoslash
-import { useAdapter } from 'hekapu';import createCPUAdapter from 'hekapu/adapter/cpu';const hk = useAdapter(createCPUAdapter())
+import { useAdapter } from 'hekapu'
+import createCPUAdapter from 'hekapu/adapter/cpu'
+const hk = useAdapter(createCPUAdapter())
 // ---cut---
 const vector = hk.tensor([1, 2, 3])
 
@@ -37,7 +41,9 @@ Of course, you can calculate these tensors. Some operators are supported.
 Use `tensor.add(other)` method.
 
 ```ts twoslash
-import { useAdapter } from 'hekapu';import createCPUAdapter from 'hekapu/adapter/cpu';const hk = useAdapter(createCPUAdapter())
+import { useAdapter } from 'hekapu'
+import createCPUAdapter from 'hekapu/adapter/cpu'
+const hk = useAdapter(createCPUAdapter())
 // ---cut---
 const a = hk.tensor(1)
 const b = hk.tensor(2)
@@ -56,7 +62,9 @@ CreatingTensor means tensors that may or may not have been created.
 For example, `tensor` is that code is `CreatingTensor`.
 
 ```ts twoslash
-import { useAdapter } from 'hekapu';import createCPUAdapter from 'hekapu/adapter/cpu';const hk = useAdapter(createCPUAdapter())
+import { useAdapter } from 'hekapu'
+import createCPUAdapter from 'hekapu/adapter/cpu'
+const hk = useAdapter(createCPUAdapter())
 // ---cut---
 const tensor = hk.tensor(1)
 ```
@@ -89,7 +97,9 @@ ResolvedTensor by using `await`.
 An example resolving CreatingTensor:
 
 ```ts twoslash
-import { useAdapter } from 'hekapu';import createCPUAdapter from 'hekapu/adapter/cpu';const hk = useAdapter(createCPUAdapter())
+import { useAdapter } from 'hekapu'
+import createCPUAdapter from 'hekapu/adapter/cpu'
+const hk = useAdapter(createCPUAdapter())
 // ---cut---
 const creating = hk.tensor(1)
 const resolved = await creating // Resolved!
@@ -98,7 +108,9 @@ const resolved = await creating // Resolved!
 Or, you can resolve CalculatingTensor:
 
 ```ts twoslash
-import { useAdapter } from 'hekapu';import createCPUAdapter from 'hekapu/adapter/cpu';const hk = useAdapter(createCPUAdapter())
+import { useAdapter } from 'hekapu'
+import createCPUAdapter from 'hekapu/adapter/cpu'
+const hk = useAdapter(createCPUAdapter())
 // ---cut---
 const calculating = hk.tensor(1).add(hk.tensor(1))
 const resolved = await calculating // Resolved!

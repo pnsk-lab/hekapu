@@ -10,22 +10,26 @@ export default defineConfig({
     codeTransformers: [
       transformerTwoslash({
         typesCache: createFileSystemTypesCache({
-          dir: 'docs/.vitepress/cache/twoslash'
+          dir: 'docs/.vitepress/cache/twoslash',
         }),
         twoslashOptions: {
           compilerOptions: {
-            paths: Object.fromEntries(Object.entries(denoConfig.exports).map(([k, path]): [string, string[]] => [`hekapu${k.slice(1)}`, [path]]))
-          }
-        }
-      }) as NonNullable<MarkdownOptions['codeTransformers']>[number]
-    ]
+            paths: Object.fromEntries(
+              Object.entries(denoConfig.exports).map((
+                [k, path],
+              ): [string, string[]] => [`hekapu${k.slice(1)}`, [path]]),
+            ),
+          },
+        },
+      }) as NonNullable<MarkdownOptions['codeTransformers']>[number],
+    ],
   },
   themeConfig: {
     socialLinks: [
       {
         icon: 'github',
         link: 'https://github.com/pnsk-lab/hekapu',
-      }
+      },
     ],
     sidebar: [
       {
@@ -38,8 +42,8 @@ export default defineConfig({
           },
           {
             text: 'Typings',
-            link: '/typings'
-          }
+            link: '/typings',
+          },
         ],
       },
       {
