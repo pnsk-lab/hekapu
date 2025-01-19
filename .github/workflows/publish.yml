@@ -17,6 +17,15 @@ jobs:
         with:
           deno-version: v2.x
 
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          registry-url: 'https://registry.npmjs.org'
+          always-auth: true
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       - name: Install dependencies and build
         run: deno i && deno task build ${GITHUB_REF#refs/tags/}
 
