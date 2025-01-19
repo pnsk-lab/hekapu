@@ -1,13 +1,13 @@
-# Metori
+# Hekapu
 
-Metori is a library for calculating tensorsand creating ML programs, with
+Hekapu is a library for calculating tensorsand creating ML programs, with
 TypeScript.
 
 ## Example
 
 ```ts
-import { useAdapter } from '@pnsk-lab/metori'
-import createCPUAdapter from '@pnsk-lab/metori/adapter/cpu'
+import { useAdapter } from '@pnsk-lab/hekapu'
+import createCPUAdapter from '@pnsk-lab/hekapu/adapter/cpu'
 
 const mt = useAdapter(createCPUAdapter())
 

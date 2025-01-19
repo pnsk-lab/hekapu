@@ -1,8 +1,8 @@
 ---
-title: Metori - A ML library for TS
+title: Hekapu - A ML library for TS
 layout: home
 hero:
-  name: Metori
+  name: Hekapu
   text: A ML library for TS.
   tagline: Build ML projects with TS.
   actions:
@@ -11,12 +11,12 @@ hero:
       link: /guide/getting-started
     - theme: alt
       text: GitHub
-      link: https://github.com/pnsk-lab/metori
+      link: https://github.com/pnsk-lab/hekapu
 features:
   - icon: 🧩
     title: TypeScript Support
     details: High-level TypeScript Support. You can get Type-Safe.
   - icon: 🪶
     title: Simple
-    details: Metori provides super simple APIs.
+    details: Hekapu provides super simple APIs.
 ---

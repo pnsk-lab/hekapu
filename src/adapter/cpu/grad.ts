@@ -1,6 +1,6 @@
 import type { Tensor } from '../../core/tensor/types.ts'
 import type { CalculatingNode, TensorShape } from '../../types.ts'
-import type { GradResult, MetoriAdapter } from '../shared.ts'
+import type { GradResult, HekapuAdapter } from '../shared.ts'
 import type { CPUAdapter, CPUTensor, CPUData } from './mod.ts'
 import { add, dot, matVecMul, sub } from './operands.ts'
 import { ResolvedTensor } from '../../core/tensor/tensor.ts'

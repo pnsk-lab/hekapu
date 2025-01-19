@@ -1,5 +1,5 @@
 {
-  "name": "@pnsk-lab/metori",
+  "name": "@pnsk-lab/hekapu",
   "exports": {
     ".": "./src/mod.ts",
     "./adapter/cpu": "./src/adapter/cpu/mod.ts"

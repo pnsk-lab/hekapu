@@ -1,13 +1,13 @@
-# Welcome to Metori guide
+# Welcome to Hekapu guide
 
-Metori is a TypeScript library for building ML projects.
+Hekapu is a TypeScript library for building ML projects.
 
 You can install via JSR.
 
 Here is a simple example:
 ```ts
-import { useAdapter } from '@pnsk-lab/metori'
-import createCPUAdapter from '@pnsk-lab/metori/adapter/cpu'
+import { useAdapter } from '@pnsk-lab/hekapu'
+import createCPUAdapter from '@pnsk-lab/hekapu/adapter/cpu'
 
 const mt = useAdapter(createCPUAdapter())
 

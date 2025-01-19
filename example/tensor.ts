@@ -1,5 +1,5 @@
-import { useAdapter } from '@pnsk-lab/metori'
-import createCPUAdapter from '@pnsk-lab/metori/adapter/cpu'
+import { useAdapter } from '@pnsk-lab/hekapu'
+import createCPUAdapter from '@pnsk-lab/hekapu/adapter/cpu'
 
 const mt = useAdapter(createCPUAdapter())
 

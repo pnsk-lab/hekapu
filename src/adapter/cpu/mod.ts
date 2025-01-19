@@ -1,4 +1,4 @@
-import type { MetoriAdapter, SupportedOperations } from '../shared.ts'
+import type { HekapuAdapter, SupportedOperations } from '../shared.ts'
 import type {
   AnyShapeJSArrayOrNumber,
   CalculatingNode,
@@ -18,8 +18,8 @@ export type CPUTensor = {
 export interface CPUData {
   tensor: CPUTensor
 }
-export class CPUAdapter implements MetoriAdapter<CPUData> {
-  name = 'metori/cpu'
+export class CPUAdapter implements HekapuAdapter<CPUData> {
+  name = 'hekapu/cpu'
   supportedOperations: SupportedOperations = new Set([
     'add',
     'sub',
@@ -160,6 +160,6 @@ export class CPUAdapter implements MetoriAdapter<CPUData> {
   }
 }
 
-export default function createCPUAdapter(): MetoriAdapter<CPUData> {
+export default function createCPUAdapter(): HekapuAdapter<CPUData> {
   return new CPUAdapter()
 }

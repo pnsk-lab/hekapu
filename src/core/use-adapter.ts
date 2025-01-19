@@ -1,4 +1,4 @@
-import type { MetoriAdapter } from '../adapter/shared.ts'
+import type { HekapuAdapter } from '../adapter/shared.ts'
 import { type CreateTensor, useTensor } from './tensor/use-tensor.ts'
 import { type Backward, useBackward } from './use-backward.ts'
 import {
@@ -9,7 +9,7 @@ import {
 } from './use-helpers.ts'
 
 /**
- * UsedAdapter is a wrapper of MetoriAdapter
+ * UsedAdapter is a wrapper of HekapuAdapter
  */
 export interface UsedAdapter {
   tensor: CreateTensor
@@ -19,14 +19,14 @@ export interface UsedAdapter {
 }
 
 /**
- * useAdapter is a function to use MetoriAdapter
- * @param adapter - MetoriAdapter
+ * useAdapter is a function to use HekapuAdapter
+ * @param adapter - HekapuAdapter
  * @returns UsedAdapter
  *
  * @example
  * ```ts
- * import { useAdapter } from '@pnsk-lab/metori'
- * import createCPUAdapter from '@pnsk-lab/metori/adapter/cpu'
+ * import { useAdapter } from '@pnsk-lab/hekapu'
+ * import createCPUAdapter from '@pnsk-lab/hekapu/adapter/cpu'
  *
  * const adapter = createCPUAdapter()
  * const mt = useAdapter(adapter)
@@ -35,7 +35,7 @@ export interface UsedAdapter {
  * mt.zeros([2, 2]) // Create Tensor with zeros, shape: [2, 2]
  * ```
  */
-export const useAdapter = (adapter: MetoriAdapter): UsedAdapter => {
+export const useAdapter = (adapter: HekapuAdapter): UsedAdapter => {
   return {
     tensor: useTensor(adapter),
     backward: useBackward(adapter),

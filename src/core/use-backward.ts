@@ -1,4 +1,4 @@
-import type { MetoriAdapter } from '../adapter/shared.ts'
+import type { HekapuAdapter } from '../adapter/shared.ts'
 import type { TensorShape } from '../types.ts'
 import { ResolvedTensor } from './tensor/tensor.ts'
 import type { Tensor } from './tensor/types.ts'
@@ -9,7 +9,7 @@ export interface BackwardResult {
 export interface Backward {
   (y: Tensor<TensorShape>): Promise<BackwardResult>
 }
-export const useBackward = (adapter: MetoriAdapter<any>): Backward => {
+export const useBackward = (adapter: HekapuAdapter<any>): Backward => {
   return async (y) => {
     const history = y.node
     const grads = await adapter.calculateGradient(history)

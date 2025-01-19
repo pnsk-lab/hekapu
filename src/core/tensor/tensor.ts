@@ -1,4 +1,4 @@
-import type { MetoriAdapter } from '../../adapter/shared.ts'
+import type { HekapuAdapter } from '../../adapter/shared.ts'
 import type { CalculatingNode, Compatible } from '../../types.ts'
 import type { TensorShape } from '../../types.ts'
 import type { Tensor } from './types.ts'
@@ -22,7 +22,7 @@ abstract class TensorBase<Shape extends TensorShape> {
 
   abstract node: CalculatingNode
 
-  readonly adapter: MetoriAdapter<any>
+  readonly adapter: HekapuAdapter<any>
 
   id = Symbol('Unique ID')
 
@@ -34,7 +34,7 @@ abstract class TensorBase<Shape extends TensorShape> {
     })
   }
 
-  constructor(adapter: MetoriAdapter<any>) {
+  constructor(adapter: HekapuAdapter<any>) {
     this.adapter = adapter
   }
 
@@ -91,7 +91,7 @@ abstract class TensorBase<Shape extends TensorShape> {
 
 export interface ResolvedTensorInit {
   data: any
-  adapter: MetoriAdapter<any>
+  adapter: HekapuAdapter<any>
 }
 export class ResolvedTensor<Shape extends TensorShape> extends TensorBase<Shape> {
   isResolved: true = true
@@ -115,7 +115,7 @@ export class ResolvedTensor<Shape extends TensorShape> extends TensorBase<Shape>
 }
 
 export interface CreatingTensorInit {
-  adapter: MetoriAdapter<any>
+  adapter: HekapuAdapter<any>
   data: any | Promise<any>
   requiresGrad: boolean
 }
@@ -192,7 +192,7 @@ export class CreatingTensor<Shape extends TensorShape> extends TensorBase<Shape>
 
 export interface CalculatingTensorInit {
   node: CalculatingNode
-  adapter: MetoriAdapter<any>
+  adapter: HekapuAdapter<any>
   createPromises: Promise<unknown>[]
 }
 

@@ -1,11 +1,11 @@
 # Adapter
 
-Metori has a target, it works any runtimes.
-Adapter will make Metori able to do that.
+Hekapu has a target, it works any runtimes.
+Adapter will make Hekapu able to do that.
 
 ## What's Adapter?
 
-Adapters are wrappers to connect between Metori and JS runtimes/devices.
+Adapters are wrappers to connect between Hekapu and JS runtimes/devices.
 
 For example, you can run your app on CPU if you use CPU adapter.
 If you changed your mind and you want to use GPU on Deno, you can choose or create optimal adapter.
@@ -13,15 +13,15 @@ If you changed your mind and you want to use GPU on Deno, you can choose or crea
 ## Usage
 
 ```ts
-import { useAdapter } from '@pnsk-lab/metori'
-import createCPUAdapter from '@pnsk-lab/metori/adapter/cpu'
+import { useAdapter } from '@pnsk-lab/hekapu'
+import createCPUAdapter from '@pnsk-lab/hekapu/adapter/cpu'
 
 const mt = useAdapter(createCPUAdapter())
 
 const scalar = mt.tensor(0)
 ```
 
-Import adapter and useAdapter to use Metori.
+Import adapter and useAdapter to use Hekapu.
 
 ## Built-in Adapters
 
