@@ -11,9 +11,9 @@ export default defineConfig({
         items: [
           {
             text: 'Getting Started',
-            link: '/getting-started'
-          }
-        ]
+            link: '/getting-started',
+          },
+        ],
       },
       {
         text: 'APIs',
@@ -21,14 +21,14 @@ export default defineConfig({
         items: [
           {
             text: 'Tensor',
-            link: '/tensor'
+            link: '/tensor',
           },
           {
             text: 'Adapter',
-            link: '/adapter'
-          }
-        ]
-      }
-    ]
-  }
+            link: '/adapter',
+          },
+        ],
+      },
+    ],
+  },
 })

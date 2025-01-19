@@ -120,7 +120,7 @@ Deno.test('matVecMul', async (t) => {
     const right = { shape: [2, 2], data: [[3, 4], [5, 6]] }
     assertEquals(
       matVecMul(left, right),
-      { shape: [2], data: [11, 17] }
+      { shape: [2], data: [11, 17] },
     )
   })
   await t.step('3-dimentional vector and 3x3 matrix', () => {

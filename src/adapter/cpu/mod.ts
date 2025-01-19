@@ -64,7 +64,7 @@ export class CPUAdapter implements HekapuAdapter<CPUData> {
         const rightTensor = this.calculate(tree.right).tensor
         add(leftTensor, rightTensor)
         return {
-          tensor: leftTensor
+          tensor: leftTensor,
         }
       }
       case 'sub': {
@@ -137,7 +137,7 @@ export class CPUAdapter implements HekapuAdapter<CPUData> {
         return {
           tensor: {
             shape: [input.shape.length],
-            data: input.shape
+            data: input.shape,
           },
         }
       }

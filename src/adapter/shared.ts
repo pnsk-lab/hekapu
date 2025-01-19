@@ -36,12 +36,16 @@ export interface HekapuAdapter<T> {
    * @param tree Calculating tree
    * @returns Gradient
    */
-  calculateGradient: (tree: CalculatingNode<T>) => Promise<GradResult<T>> | GradResult<T>
+  calculateGradient: (
+    tree: CalculatingNode<T>,
+  ) => Promise<GradResult<T>> | GradResult<T>
 
   /**
    * Convert tensor to array
    * @param id Tensor ID
    * @returns Array
    */
-  toArray: (data: T) => Promise<AnyShapeJSArrayOrNumber> | AnyShapeJSArrayOrNumber
+  toArray: (
+    data: T,
+  ) => Promise<AnyShapeJSArrayOrNumber> | AnyShapeJSArrayOrNumber
 }

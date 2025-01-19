@@ -1,7 +1,7 @@
 import type { Tensor } from '../../core/tensor/types.ts'
 import type { CalculatingNode, TensorShape } from '../../types.ts'
 import type { GradResult, HekapuAdapter } from '../shared.ts'
-import type { CPUAdapter, CPUTensor, CPUData } from './mod.ts'
+import type { CPUAdapter, CPUData, CPUTensor } from './mod.ts'
 import { add, dot, matVecMul, sub } from './operands.ts'
 import { ResolvedTensor } from '../../core/tensor/tensor.ts'
 
@@ -11,7 +11,10 @@ export function grad(
   y: CalculatingNode<CPUData>,
 ): GradResult<CPUData> {
   // First, forward it.
-  const forwardedTensors = new Map<CalculatingNode<CPUData> | symbol, CPUTensor>()
+  const forwardedTensors = new Map<
+    CalculatingNode<CPUData> | symbol,
+    CPUTensor
+  >()
   const getForwardedTensor = (node: CalculatingNode<CPUData>): CPUTensor => {
     const key = node.type === 'tensor' ? node.id : node
     const tensor = forwardedTensors.get(key)
@@ -78,7 +81,7 @@ export function grad(
   const grads = new Map<CalculatingNode<CPUData> | symbol, CPUTensor>()
   const getGradByNode = (node: CalculatingNode<CPUData>): CPUTensor => {
     const key = node.type === 'tensor' ? node.id : node
-    
+
     const forwarded = forwardedTensors.get(key)
     if (!forwarded) {
       throw new Error(`Forwarded tensor for not found.`)
@@ -115,8 +118,14 @@ export function grad(
         break
       }
       case 'sub': {
-        setGradByNode(node.left, add(getGradByNode(node.left), { shape: [], data: 1 }))
-        setGradByNode(node.right, add(getGradByNode(node.right), { shape: [], data: -1 }))
+        setGradByNode(
+          node.left,
+          add(getGradByNode(node.left), { shape: [], data: 1 }),
+        )
+        setGradByNode(
+          node.right,
+          add(getGradByNode(node.right), { shape: [], data: -1 }),
+        )
         backward(node.left)
         backward(node.right)
         break
@@ -140,16 +149,16 @@ export function grad(
 
         const gradA: CPUTensor = {
           data: [],
-          shape: matrix.shape
+          shape: matrix.shape,
         }
         for (let i = 0; i < matrix.shape[0]; i++) {
-          (gradA.data as number[][]).push([...vector.data as number[]])
+          ;(gradA.data as number[][]).push([...vector.data as number[]])
         }
         setGradByNode(matrixNode, add(getGradByNode(matrixNode), gradA))
 
         const gradX: CPUTensor = {
           data: [],
-          shape: matrix.shape
+          shape: matrix.shape,
         }
         for (let n = 0; n < matrix.shape[1]; n++) {
           let sum = 0
@@ -187,10 +196,10 @@ export function grad(
       .map((
         [k, v],
       ): [symbol, CPUData] => [
-        (k as symbol),
+        k as symbol,
         {
           tensor: v,
-        }
+        },
       ]),
   )
 }
