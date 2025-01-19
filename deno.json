@@ -14,14 +14,11 @@
     "singleQuote": true
   },
   "imports": {
-    "@david/dax": "jsr:@david/dax@^0.42.0",
+    "@shikijs/vitepress-twoslash": "npm:@shikijs/vitepress-twoslash@^1.27.2",
     "@std/assert": "jsr:@std/assert@^1.0.10",
     "@std/fs": "jsr:@std/fs@^1.0.9",
     "@std/path": "jsr:@std/path@^1.0.8",
-    "esbuild": "npm:esbuild@^0.24.2",
-    "hekapu": "npm:hekapu@0.1.4",
     "tsup": "npm:tsup@^8.3.5",
-    "typescript": "npm:typescript@^5.7.3",
     "vitepress": "npm:vitepress@^1.5.0",
     "vue": "npm:vue@^3.5.13"
   },
