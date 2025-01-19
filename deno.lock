@@ -5,7 +5,8 @@
     "jsr:@std/internal@^1.0.5": "1.0.5",
     "npm:create-vitepress@*": "0.0.6",
     "npm:vitepress@*": "1.5.0_vite@5.4.11_vue@3.5.13_focus-trap@7.6.2",
-    "npm:vitepress@^1.5.0": "1.5.0_vite@5.4.11_vue@3.5.13_focus-trap@7.6.2"
+    "npm:vitepress@^1.5.0": "1.5.0_vite@5.4.11_vue@3.5.13_focus-trap@7.6.2",
+    "npm:vue@^3.5.13": "3.5.13"
   },
   "jsr": {
     "@std/assert@1.0.10": {
@@ -938,7 +939,8 @@
   "workspace": {
     "dependencies": [
       "jsr:@std/assert@^1.0.10",
-      "npm:vitepress@^1.5.0"
+      "npm:vitepress@^1.5.0",
+      "npm:vue@^3.5.13"
     ]
   }
 }
