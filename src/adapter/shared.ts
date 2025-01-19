@@ -9,7 +9,7 @@ export type SupportedOperations = Set<CalculatingNode['type']>
 
 export type GradResult<T> = Map<symbol, T>
 
-export interface MetoriAdapter<T> {
+export interface HekapuAdapter<T> {
   name: string
 
   /**

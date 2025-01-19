@@ -1,16 +1,21 @@
 {
-  "name": "@pnsk-lab/metori",
+  "name": "@pnsk-lab/hekapu",
   "exports": {
     ".": "./src/mod.ts",
     "./adapter/cpu": "./src/adapter/cpu/mod.ts"
   },
   "tasks": {
+    "docs:dev": "deno run -A npm:vitepress dev docs",
+    "docs:build": "deno run -A npm:vitepress build docs"
   },
   "fmt": {
     "semiColons": false,
     "singleQuote": true
   },
   "imports": {
-    "@std/assert": "jsr:@std/assert@^1.0.10"
-  }
+    "@std/assert": "jsr:@std/assert@^1.0.10",
+    "vitepress": "npm:vitepress@^1.5.0",
+    "vue": "npm:vue@^3.5.13"
+  },
+  "nodeModulesDir": "auto"
 }

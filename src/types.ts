@@ -1,4 +1,4 @@
-import type { MetoriAdapter } from './adapter/shared.ts'
+import type { HekapuAdapter } from './adapter/shared.ts'
 
 export type TensorShape = number[]
 
@@ -58,6 +58,6 @@ export type CalculatingNode<T = unknown> = {
 }
 
 export interface TensorInternalOptions {
-  adapter: MetoriAdapter<any>
+  adapter: HekapuAdapter<any>
   calculatingHistory?: CalculatingNode
 }

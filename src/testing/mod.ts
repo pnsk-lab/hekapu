@@ -1,7 +1,7 @@
 /**
  * @example
  * ```ts
- * import { useCalculator } from '@pnsk-lab/metori/testing'
+ * import { useCalculator } from '@pnsk-lab/hekapu/testing'
  * ```
  * @module
  */
