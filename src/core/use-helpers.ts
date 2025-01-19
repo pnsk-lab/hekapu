@@ -5,7 +5,7 @@ import type { HekapuAdapter } from '../adapter/shared.ts'
 export interface CreateZeros {
   <S extends TensorShape>(shape: S): CalculatingTensor<S>
 }
-export const useZeros = (adapter: HekapuAdapter): CreateZeros => {
+export const useZeros = (adapter: HekapuAdapter<any>): CreateZeros => {
   return (shape) => {
     return new CalculatingTensor({
       node: {
@@ -21,7 +21,7 @@ export const useZeros = (adapter: HekapuAdapter): CreateZeros => {
 export interface CreateOnes {
   <S extends TensorShape>(shape: S): CalculatingTensor<S>
 }
-export const useOnes = (adapter: HekapuAdapter): CreateOnes => {
+export const useOnes = (adapter: HekapuAdapter<any>): CreateOnes => {
   return (shape) => {
     return new CalculatingTensor({
       node: {
